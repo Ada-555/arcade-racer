@@ -87,9 +87,6 @@
     .gbtn:hover { background: rgba(233,69,96,0.7); }
 
     /* Shield activate button — big centered button on mobile */
-    #shld-btn { display: none; }
-    @keyframes shieldPulse { 0%,100%{box-shadow: 0 0 8px rgba(79,195,247,0.4)} 50%{box-shadow: 0 0 20px rgba(79,195,247,0.8)} }
-    #shld-btn:active { background: rgba(79,195,247,0.4); }
     #shield-emoji { font-size: clamp(12px, 2vw, 18px); }
     #shield-emoji.ready { animation: shieldEmojiPulse 0.9s ease-in-out infinite; }
     #shield-emoji.active { filter: drop-shadow(0 0 6px #4fc3f7) drop-shadow(0 0 12px #4fc3f7); }
@@ -496,7 +493,6 @@ function launch(type,level=1){
   showOvid(null);
   $('cwrap').style.display='flex';
   $('gbtns').style.display='flex';
-  $('shld-btn').style.display='none';
   $('mute-btn').style.display='flex';
   $('dpad').style.display='grid';
 
