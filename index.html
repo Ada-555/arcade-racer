@@ -113,6 +113,11 @@
     .db:active, .db.ps { background: #e94560; }
     .de { visibility: hidden; }
     .db.gone { visibility: hidden; pointer-events: none; }
+    .db.shield { background: rgba(79,195,247,0.15); border-color: rgba(79,195,247,0.2); color: #4fc3f7; font-size: 22px; }
+    .db.shield.ready { background: rgba(79,195,247,0.3); border-color: #4fc3f7; animation: shieldPulse 0.8s ease-in-out infinite; }
+    .db.shield.active { background: rgba(79,195,247,0.6); border-color: #4fc3f7; box-shadow: 0 0 15px rgba(79,195,247,0.7); }
+    @keyframes shieldPulse { 0%,100% { box-shadow: 0 0 5px rgba(79,195,247,0.4); transform: scale(1); } 50% { box-shadow: 0 0 20px rgba(79,195,247,0.8); transform: scale(1.05); } }
+    .db.shield.nocharge { opacity: 0.3; cursor: default; }
   </style>
 </head>
 <body>
@@ -238,10 +243,10 @@
       <button class="db gone" id="bup">▲</button>
       <div class="de"></div>
       <button class="db" id="bleft">◀</button>
-      <div class="de"></div>
+      <button class="db shield" id="bshield" onclick="activateShield()">🛡</button>
       <button class="db" id="bright">▶</button>
       <div class="de"></div>
-      <button class="db" id="bdown">▼</button>
+      <button class="db gone" id="bdown">▼</button>
       <div class="de"></div>
     </div>
   </div>
@@ -369,6 +374,7 @@ function launch(type,level=1){
   if(type==='race'){
     $('bup').classList.add('gone');
     $('bdown').classList.add('gone');
+    $('bshield').classList.remove('gone');
     $('race-hud').style.display='flex';
     $('park-hud').style.display='none';
     $('tbw').style.display='none';
@@ -376,6 +382,7 @@ function launch(type,level=1){
   } else {
     $('bup').classList.remove('gone');
     $('bdown').classList.remove('gone');
+    $('bshield').classList.add('gone');
     $('race-hud').style.display='none';
     $('park-hud').style.display='flex';
     $('tbw').style.display='block';
@@ -484,7 +491,7 @@ const Race=(()=>{
   let trail=[];
 
   function init(){
-    Lv=1; Sco=0; Spd=220; CL=1; Grc=3;
+    Lv=1; Sco=0; Spd=260; CL=1; Grc=3;
     En=[];St=[];Pt=[];trail=[];
     ov=false;inv=0;dT=0;dL=0;totalT=0;lsTm=0;lsSt=0;
     shld=SHIELD_MAX; shldA=false; shldT=0; shldReady=false;
@@ -524,6 +531,20 @@ const Race=(()=>{
       if(shld>=SHIELD_MAX&&!shldReady){shldReady=true;sShield();}
     }
     $('shld-fill').style.width=(shld/SHIELD_MAX*100)+'%';
+    // Shield button state update
+    const sb=$('bshield');
+    if(sb){
+      if(shldA){
+        sb.classList.add('active');
+        sb.classList.remove('ready','nocharge');
+      } else if(shldReady){
+        sb.classList.add('ready');
+        sb.classList.remove('active','nocharge');
+      } else {
+        sb.classList.add('nocharge');
+        sb.classList.remove('active','ready');
+      }
+    }
     if(shldReady&&!shldA){
       $('shld-ready').style.display='inline';
       $('shield-emoji').style.display='inline';
@@ -544,14 +565,14 @@ const Race=(()=>{
     if(Lft()&&CL>0){CL--;K['ArrowLeft']=false;K['KeyA']=false;}
     if(Rg()&&CL<Lanes-1){CL++;K['ArrowRight']=false;K['KeyD']=false;}
 
-    const esp=Spd+dL*30;
+    const esp=Spd+dL*45;
     const sp=shldA?esp*0.8:esp; // shield = slower (less exposure)
 
     // Spawn
     lsTm-=dt;
     if(lsTm<=0){
       sE(sp);
-      const baseInt=Math.max(0.4,1.6-dL*0.13);
+      const baseInt=Math.max(0.3,1.4-dL*0.15);
       lsTm=shldA?baseInt*1.3:baseInt;
     }
 
@@ -669,7 +690,7 @@ const Race=(()=>{
     Pt.forEach(p=>{cx.globalAlpha=p.l;cx.fillStyle=p.col;cx.beginPath();cx.arc(p.x,p.y,4*p.l,0,Math.PI*2);cx.fill();});
     cx.globalAlpha=1;
 
-    if(dL>0){cx.fillStyle='rgba(255,215,0,0.78)';cx.font='bold 12px Orbitron,sans-serif';cx.textAlign='left';cx.fillText(`SPD +${dL*30}`,16,BH-14);}
+    if(dL>0){cx.fillStyle='rgba(255,215,0,0.78)';cx.font='bold 12px Orbitron,sans-serif';cx.textAlign='left';cx.fillText(`SPD +${dL*45}`,16,BH-14);}
 
     if(Grc>0){
       cx.fillStyle='rgba(0,0,0,0.43)';cx.fillRect(0,0,BW,BH);
@@ -725,7 +746,7 @@ const Race=(()=>{
     const top=hsCheck('race_hs',Sco);
     $('ovtit').textContent='RACE OVER';
     $('ovsco').textContent=`SCORE: ${Math.floor(Sco)}`;
-    $('ovtime').textContent=`TIME: ${fmtTime(totalT)}  |  SPD +${dL*30}`;
+    $('ovtime').textContent=`TIME: ${fmtTime(totalT)}  |  SPD +${dL*45}`;
     $('ovhs').textContent=fmtHS(top);
     showOvid('ovover');
   }
@@ -824,7 +845,7 @@ const Parking=(()=>{
     cx.fillStyle='#2ecc71';cx.font='bold 34px sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.fillText('P',0,0);cx.restore();
 
     // Top-down car: long (CH > CW), 4 black wheels, dark roof
-    cx.save();cx.translate(car.x,car.y);cx.rotate(car.a);
+    cx.save();cx.translate(car.x,car.y);cx.rotate(car.a + Math.PI / 2);
     const L2=-CW/2,R2=CW/2,T2=-CH/2,B2=CH/2;
     cx.fillStyle='#9b59b6';cx.beginPath();cx.roundRect(L2,T2,CW,CH,5);cx.fill();
     cx.fillStyle='#7d3f9b';cx.beginPath();cx.roundRect(L2+CW*0.18,T2+CH*0.22,CW*0.64,CH*0.42,3);cx.fill();
