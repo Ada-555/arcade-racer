@@ -6,254 +6,259 @@
   <title>ARCADE RACER</title>
   <style>
     *, *:before, *:after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      width: 100%; height: 100%; overflow: hidden;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #1a1a2e; color: #eee;
-    }
+    html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; background: #1a1a2e; color: #eee; }
 
-    /* ========== SCREENS ========== */
-    .screen { display: none; position: absolute; inset: 0; }
-    .screen.active { display: flex; }
+    /* === FULL-SCREEN LAYER === */
+    body { position: relative; }
 
-    /* HOMEPAGE */
-    #screen-home {
+    /* === SCREEN OVERLAYS === */
+    .scr {
+      display: none; position: fixed; inset: 0;
       flex-direction: column; align-items: center; justify-content: center;
-      padding: 20px; background: #1a1a2e;
     }
-    #screen-home h1 {
-      font-size: clamp(2.5rem, 8vw, 5rem); font-weight: 900; letter-spacing: 0.08em;
+    .scr.on { display: flex; }
+
+    /* HOME */
+    #shome { background: #1a1a2e; }
+    #shome h1 {
+      font-size: clamp(2.5rem, 9vw, 5rem); font-weight: 900; letter-spacing: 0.08em;
       background: linear-gradient(135deg, #e94560, #ff8c42);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      margin-bottom: 0.2em; text-align: center;
+      margin-bottom: 0.15em; text-align: center;
     }
-    #screen-home .subtitle { color: #888; font-size: 1.1rem; margin-bottom: 3em; text-align: center; }
-    .game-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;
-      width: 100%; max-width: 700px;
+    .sub { color: #777; font-size: 1rem; margin-bottom: 2.5em; text-align: center; }
+    .gg {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 18px;
+      width: 90%; max-width: 660px;
     }
-    .game-card {
-      background: #16213e; border-radius: 12px; padding: 30px; text-align: center;
-      cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; border: 2px solid transparent;
+    .gc {
+      background: #16213e; border-radius: 12px; padding: 28px 20px; text-align: center;
+      cursor: pointer; transition: transform 0.18s, box-shadow 0.18s; border: 2px solid transparent;
     }
-    .game-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(233,69,96,0.25); border-color: #e94560; }
-    .game-card h2 { font-size: 1.5rem; margin-bottom: 0.5em; color: #e94560; }
-    .game-card p { color: #aaa; font-size: 0.95rem; margin-bottom: 1.5em; }
-    .play-btn {
-      background: #e94560; border: none; color: white; padding: 12px 32px;
-      border-radius: 6px; font-size: 18px; cursor: pointer; font-weight: 700;
-      transition: background 0.2s, transform 0.1s;
+    .gc:hover { transform: translateY(-4px); box-shadow: 0 8px 22px rgba(233,69,96,0.22); border-color: #e94560; }
+    .gc h2 { font-size: 1.4rem; margin-bottom: 0.4em; color: #e94560; }
+    .gc p { color: #999; font-size: 0.9rem; margin-bottom: 1.3em; line-height: 1.4; }
+    .pbtn {
+      background: #e94560; border: none; color: #fff; padding: 11px 28px;
+      border-radius: 6px; font-size: 17px; font-weight: 700; cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
     }
-    .play-btn:hover { background: #ff5a75; transform: scale(1.05); }
+    .pbtn:hover { background: #ff5a75; transform: scale(1.04); }
 
     /* MODE SELECT */
-    .mode-screen { flex-direction: column; align-items: center; justify-content: center; background: #1a1a2e; }
-    .mode-screen h2 { font-size: clamp(1.8rem, 5vw, 2.5rem); color: #e94560; margin-bottom: 0.5em; }
-    .mode-screen .level-grid {
-      display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 1em;
+    .smode { background: #1a1a2e; }
+    .smode h2 { font-size: clamp(1.7rem, 5vw, 2.4rem); color: #e94560; margin-bottom: 0.6em; }
+    .snote { color: #666; font-size: 0.88rem; margin-bottom: 1.2em; text-align: center; max-width: 340px; }
+    .btnrow { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+    .mbtn {
+      background: #16213e; border: 2px solid #e94560; color: #fff;
+      padding: 13px 26px; border-radius: 8px; font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: background 0.15s;
     }
-    .level-btn {
-      background: #16213e; border: 2px solid #333; color: #aaa;
-      padding: 10px 0; border-radius: 8px; font-size: 15px; font-weight: 700;
-      cursor: pointer; transition: all 0.15s; min-width: 52px;
+    .mbtn:hover { background: #e94560; }
+    .bb {
+      background: transparent; border: 2px solid #444; color: #888;
+      padding: 9px 22px; border-radius: 6px; font-size: 13px; cursor: pointer; margin-top: 1.4em;
     }
-    .level-btn:hover { border-color: #e94560; color: #e94560; background: #1e2a4a; }
-    .btn-row { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
-    .mode-btn {
-      background: #16213e; border: 2px solid #e94560; color: white;
-      padding: 14px 28px; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: 700;
-      transition: background 0.2s;
+    .bb:hover { border-color: #777; color: #bbb; }
+
+    /* LEVEL GRID */
+    .lgrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 0.5em; }
+    .lbtn {
+      background: #16213e; border: 2px solid #333; color: #888;
+      padding: 9px 0; border-radius: 7px; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: all 0.12s;
     }
-    .mode-btn:hover { background: #e94560; }
-    .back-btn {
-      background: transparent; border: 2px solid #555; color: #aaa;
-      padding: 10px 24px; border-radius: 6px; font-size: 14px; cursor: pointer; margin-top: 1.5em;
-    }
-    .back-btn:hover { border-color: #888; color: #ccc; }
+    .lbtn:hover { border-color: #e94560; color: #e94560; background: #1e2a4a; }
 
     /* GAME SCREEN */
-    #screen-game { flex-direction: column; align-items: center; justify-content: center; background: #1a1a2e; }
-    #canvas-wrapper { position: relative; display: flex; align-items: center; justify-content: center; background: #000; }
-    #game-canvas { display: block; image-rendering: pixelated; }
+    #sgame {
+      background: #000;
+      flex-direction: column;
+    }
+    #cwrap {
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      background: #000;
+      /* will be set by JS */
+    }
+    #gcanv { display: block; }
 
     /* HUD */
     .hud {
-      position: absolute; top: 0; left: 0; right: 0; padding: 10px 16px;
+      position: absolute; top: 0; left: 0; right: 0; padding: 9px 14px;
       display: flex; justify-content: space-between; align-items: center;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.65), transparent);
-      pointer-events: none; font-size: clamp(13px, 2.5vw, 18px); font-weight: 700; z-index: 5;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+      pointer-events: none; font-size: clamp(12px, 2.2vw, 17px); font-weight: 700; z-index: 5;
     }
-    .hud-lives { color: #e94560; }
-    .hud-score { color: #ffd700; }
-    .hud-level { color: #4fc3f7; }
-    #hud-boost-wrap { display: flex; align-items: center; gap: 6px; }
-    #boost-label { font-size: 0.75em; color: #aaa; }
-    #boost-bar { width: 80px; height: 8px; background: #333; border-radius: 4px; overflow: hidden; }
-    #boost-fill { height: 100%; width: 100%; background: linear-gradient(90deg, #e94560, #ff8c42); border-radius: 4px; transition: width 0.1s; }
+    .hl { color: #e94560; }
+    .hs { color: #ffd700; }
+    .hle { color: #4fc3f7; }
+    #boostw { display: flex; align-items: center; gap: 5px; }
+    #blbl { font-size: 0.7em; color: #aaa; }
+    #bbar { width: 72px; height: 7px; background: #333; border-radius: 4px; overflow: hidden; }
+    #bfil { height: 100%; width: 100%; background: linear-gradient(90deg, #e94560, #ff8c42); border-radius: 4px; }
+
+    /* TIMER */
+    #tbw {
+      position: absolute; bottom: 7px; left: 50%; transform: translateX(-50%);
+      width: 58%; max-width: 380px; pointer-events: none; z-index: 5;
+    }
+    #tbr { height: 7px; border-radius: 4px; background: #2a2a2a; overflow: hidden; }
+    #tfi { height: 100%; border-radius: 4px; transition: width 0.12s, background 0.3s; }
+    #tlbl { text-align: center; font-size: 10px; color: #888; margin-top: 2px; }
+
+    /* GAME BUTTONS */
+    #gbtns {
+      position: absolute; top: 8px; right: 8px; z-index: 6;
+      display: none; gap: 7px;
+    }
+    .gbtn {
+      background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.2);
+      color: #fff; width: 34px; height: 34px; border-radius: 50%;
+      font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .gbtn:hover { background: rgba(233,69,96,0.7); }
 
     /* OVERLAYS */
-    .overlay {
+    .ov {
       display: none; position: absolute; inset: 0;
-      background: rgba(0,0,0,0.82);
+      background: rgba(0,0,0,0.84);
       flex-direction: column; align-items: center; justify-content: center; z-index: 10;
     }
-    .overlay.active { display: flex; }
-    .overlay h2 { font-size: clamp(2rem, 6vw, 3.5rem); margin-bottom: 0.3em; }
-    .overlay .big-score { font-size: clamp(1.2rem, 4vw, 2rem); color: #ffd700; margin-bottom: 1.2em; }
-    .overlay .btn-row { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
-    .overlay .hint { color: #888; font-size: 0.9rem; margin-top: 0.5em; }
+    .ov.on { display: flex; }
+    .ov h2 { font-size: clamp(1.9rem, 6vw, 3.3rem); margin-bottom: 0.25em; }
+    .bsco { font-size: clamp(1.1rem, 3.5vw, 1.9rem); color: #ffd700; margin-bottom: 1.1em; }
+    .hint { color: #777; font-size: 0.85rem; margin-top: 0.4em; }
 
     /* MOBILE D-PAD */
     #dpad {
-      display: none; position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+      display: none; position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
       z-index: 8; user-select: none; -webkit-user-select: none;
     }
     @media (hover: none) and (pointer: coarse) { #dpad { display: grid; } }
-    .dpad-grid { display: grid; grid-template-columns: 60px 60px 60px; grid-template-rows: 60px 60px; gap: 4px; }
-    .dpad-btn {
-      background: rgba(233,69,96,0.75); border: 2px solid rgba(255,255,255,0.25);
-      border-radius: 8px; color: white; font-size: 22px;
+    .dgr { display: grid; grid-template-columns: 58px 58px 58px; grid-template-rows: 58px 58px; gap: 3px; }
+    .db {
+      background: rgba(233,69,96,0.72); border: 2px solid rgba(255,255,255,0.22);
+      border-radius: 8px; color: #fff; font-size: 21px;
       display: flex; align-items: center; justify-content: center; cursor: pointer;
       touch-action: manipulation; transition: background 0.1s;
     }
-    .dpad-btn:active, .dpad-btn.pressed { background: #e94560; }
-    .dpad-empty { visibility: hidden; }
-
-    /* TIMER BAR */
-    #timer-bar-wrap {
-      position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
-      width: 60%; max-width: 400px; pointer-events: none; z-index: 5;
-    }
-    #timer-bar { height: 8px; border-radius: 4px; background: #333; overflow: hidden; }
-    #timer-fill { height: 100%; border-radius: 4px; transition: width 0.1s, background 0.3s; }
-    #timer-label { text-align: center; font-size: 11px; color: #aaa; margin-top: 2px; }
-
-    /* IN-GAME BUTTONS */
-    #game-controls {
-      position: absolute; top: 10px; right: 10px; z-index: 6;
-      display: none; gap: 8px;
-    }
-    .game-ctrl-btn {
-      background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2);
-      color: white; width: 36px; height: 36px; border-radius: 50%;
-      font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-    }
-    .game-ctrl-btn:hover { background: rgba(233,69,96,0.7); }
+    .db:active, .db.ps { background: #e94560; }
+    .de { visibility: hidden; }
   </style>
 </head>
 <body>
 
-<!-- HOMEPAGE -->
-<div id="screen-home" class="screen active">
+<!-- HOME -->
+<div id="shome" class="scr on">
   <h1>ARCADE RACER</h1>
-  <p class="subtitle">Select your game</p>
-  <div class="game-grid">
-    <div class="game-card" onclick="navigate('mode-race')">
+  <p class="sub">Select your game</p>
+  <div class="gg">
+    <div class="gc" onclick="nav('mrace')">
       <h2>🏁 Race Mode</h2>
       <p>Dodge traffic on a 6-lane highway. Collect stars. Survive.</p>
-      <button class="play-btn">PLAY</button>
+      <button class="pbtn">PLAY</button>
     </div>
-    <div class="game-card" onclick="navigate('mode-park')">
+    <div class="gc" onclick="nav('mpark')">
       <h2>🅿️ Parking Sim</h2>
       <p>Top-down precision parking — 10 levels of increasing difficulty.</p>
-      <button class="play-btn">PLAY</button>
+      <button class="pbtn">PLAY</button>
     </div>
   </div>
 </div>
 
 <!-- RACE MODE SELECT -->
-<div id="screen-mode-race" class="screen mode-screen">
+<div id="smrace" class="scr smode">
   <h2>Race Mode</h2>
-  <p style="color:#888;margin-bottom:1.5em;font-size:0.95rem">Lanes 1-3: traffic flows with you &nbsp;|&nbsp; Lanes 4-6: oncoming traffic</p>
-  <div class="btn-row">
-    <button class="mode-btn" onclick="startGame('race')">▶ PLAY</button>
-    <button class="back-btn" onclick="navigate('home')">← Back</button>
+  <p class="snote">Lanes 1-3: traffic flows with you<br>Lanes 4-6: oncoming traffic</p>
+  <div class="btnrow">
+    <button class="mbtn" onclick="launch('race')">▶ PLAY</button>
+    <button class="bb" onclick="nav('home')">← Back</button>
   </div>
 </div>
 
 <!-- PARKING MODE SELECT -->
-<div id="screen-mode-park" class="screen mode-screen">
+<div id="smpark" class="scr smode">
   <h2>Parking Sim</h2>
-  <p style="color:#888;margin-bottom:0.8em;font-size:0.9rem">Select level:</p>
-  <div class="level-grid" id="park-level-grid"></div>
-  <div class="btn-row">
-    <button class="back-btn" onclick="navigate('home')">← Back</button>
-  </div>
+  <p class="snote">Choose a level:</p>
+  <div class="lgrid" id="lgrid"></div>
+  <button class="bb" onclick="nav('home')">← Back</button>
 </div>
 
 <!-- GAME SCREEN -->
-<div id="screen-game" class="screen">
-  <div id="canvas-wrapper">
-    <canvas id="game-canvas"></canvas>
+<div id="sgame" class="scr">
+  <div id="cwrap">
+    <canvas id="gcanv"></canvas>
 
     <!-- Race HUD -->
-    <div class="hud" id="race-hud" style="display:none">
-      <span class="hud-lives" id="hud-lives">❤️❤️</span>
-      <div id="hud-boost-wrap"><span id="boost-label">BOOST</span><div id="boost-bar"><div id="boost-fill"></div></div></div>
-      <span class="hud-score" id="hud-score">0</span>
+    <div class="hud" id="rjhud" style="display:none">
+      <span class="hl" id="hlives">❤️❤️</span>
+      <div id="boostw"><span id="blbl">BOOST</span><div id="bbar"><div id="bfil"></div></div></div>
+      <span class="hs" id="hscore">0</span>
     </div>
     <!-- Parking HUD -->
-    <div class="hud" id="park-hud" style="display:none">
-      <span class="hud-lives" id="park-lives">❤️❤️❤️</span>
-      <span class="hud-level" id="park-level">Level 1</span>
-      <span class="hud-score" id="park-score">0</span>
+    <div class="hud" id="pjhud" style="display:none">
+      <span class="hl" id="plives">❤️❤️❤️</span>
+      <span class="hle" id="plevel">Level 1</span>
+      <span class="hs" id="pscore">0</span>
     </div>
 
-    <!-- Timer bar (parking) -->
-    <div id="timer-bar-wrap" style="display:none">
-      <div id="timer-bar"><div id="timer-fill" style="width:100%;background:#2ecc71"></div></div>
-      <div id="timer-label">60s</div>
+    <!-- Timer -->
+    <div id="tbw" style="display:none">
+      <div id="tbr"><div id="tfi" style="width:100%;background:#2ecc71"></div></div>
+      <div id="tlbl">60s</div>
     </div>
 
-    <!-- On-screen controls -->
-    <div id="game-controls">
-      <button class="game-ctrl-btn" id="ctrl-pause" title="Pause">⏸</button>
+    <!-- On-screen buttons -->
+    <div id="gbtns">
+      <button class="gbtn" id="gpause" title="Pause">⏸</button>
     </div>
 
     <!-- Overlays -->
-    <div id="overlay-pause" class="overlay">
-      <h2 id="pause-title" style="color:#ffd700">PAUSED</h2>
-      <div class="btn-row">
-        <button class="mode-btn" onclick="resumeGame()">▶ Resume</button>
-        <button class="mode-btn" onclick="restartGame()">↻ Retry</button>
-        <button class="mode-btn" onclick="exitToHome()">🏠 Home</button>
+    <div class="ov" id="ovpause">
+      <h2 id="ptit" style="color:#ffd700">PAUSED</h2>
+      <div class="btnrow">
+        <button class="mbtn" onclick="resm()">▶ Resume</button>
+        <button class="mbtn" onclick="rest()">↻ Retry</button>
+        <button class="mbtn" onclick="exith()">🏠 Home</button>
       </div>
       <p class="hint">Press P or ESC to resume</p>
     </div>
-    <div id="overlay-gameover" class="overlay">
-      <h2 id="go-title" style="color:#e94560">GAME OVER</h2>
-      <p class="big-score" id="go-score">Score: 0</p>
-      <div class="btn-row">
-        <button class="mode-btn" onclick="restartGame()">↻ Retry</button>
-        <button class="mode-btn" onclick="exitToHome()">🏠 Home</button>
+    <div class="ov" id="ovover">
+      <h2 id="ovtit" style="color:#e94560">GAME OVER</h2>
+      <p class="bsco" id="ovsco">Score: 0</p>
+      <div class="btnrow">
+        <button class="mbtn" onclick="rest()">↻ Retry</button>
+        <button class="mbtn" onclick="exith()">🏠 Home</button>
       </div>
     </div>
-    <div id="overlay-levelcomplete" class="overlay">
+    <div class="ov" id="ovwin">
       <h2 style="color:#4fc3f7">LEVEL COMPLETE!</h2>
-      <p class="big-score" id="lc-score">Score: 0</p>
-      <div class="btn-row">
-        <button class="mode-btn" id="lc-next-btn">▶ Next Level</button>
-        <button class="mode-btn" onclick="exitToHome()">🏠 Home</button>
+      <p class="bsco" id="winsco">Score: 0</p>
+      <div class="btnrow">
+        <button class="mbtn" id="nxtbtn">▶ Next Level</button>
+        <button class="mbtn" onclick="exith()">🏠 Home</button>
       </div>
     </div>
-    <div id="overlay-start" class="overlay">
-      <h2 id="start-title" style="color:#e94560">GET READY!</h2>
-      <p id="start-countdown" style="font-size:3rem;color:#fff;font-weight:900;margin-top:0.3em">3</p>
+    <div class="ov" id="ovstart">
+      <h2 id="stit" style="color:#e94560">GET READY!</h2>
+      <p id="scnt" style="font-size:3rem;color:#fff;font-weight:900;margin-top:0.25em">3</p>
     </div>
   </div>
 
-  <!-- Mobile D-pad -->
+  <!-- D-pad -->
   <div id="dpad">
-    <div class="dpad-grid">
-      <div class="dpad-empty"></div>
-      <button class="dpad-btn" id="btn-up">▲</button>
-      <div class="dpad-empty"></div>
-      <button class="dpad-btn" id="btn-left">◀</button>
-      <div class="dpad-empty"></div>
-      <button class="dpad-btn" id="btn-right">▶</button>
-      <div class="dpad-empty"></div>
-      <button class="dpad-btn" id="btn-down">▼</button>
-      <div class="dpad-empty"></div>
+    <div class="dgr">
+      <div class="de"></div>
+      <button class="db" id="bup">▲</button>
+      <div class="de"></div>
+      <button class="db" id="bleft">◀</button>
+      <div class="de"></div>
+      <button class="db" id="bright">▶</button>
+      <div class="de"></div>
+      <button class="db" id="bdown">▼</button>
+      <div class="de"></div>
     </div>
   </div>
 </div>
@@ -261,744 +266,580 @@
 <script>
 'use strict';
 
-// ===== CONSTANTS =====
-const BASE_W = 800, BASE_H = 600;
-const LANE_COUNT = 6;
-// Parking physics
-const TURN_SPEED = 3, ACCELERATION = 0.3, MAX_SPEED = 4, FRICTION = 0.95;
+// ── Constants ──────────────────────────────────────────
+const BW = 800, BH = 600;  // base game resolution
+const TURN = 3, ACCEL = 0.3, MAXSP = 4, FRIC = 0.95;
+const Lanes = 6;
 
-// ===== STATE MACHINE =====
-const State = { MENU:'menu', MODE_SELECT:'mode_select', STARTING:'starting', PLAYING:'playing', PAUSED:'paused', GAME_OVER:'game_over', LEVEL_COMPLETE:'level_complete' };
-let currentState = State.MENU;
-let currentGame = null;
-let activeLevel = 1;
+// ── State ───────────────────────────────────────────────
+const ST = { MENU:0, MODSEL:1, START:2, PLAY:3, PAUS:4, OVER:5, WIN:6 };
+let state = ST.MENU, game = null, lvl = 1;
 
-// ===== CANVAS =====
-const canvas = document.getElementById('game-canvas');
-const ctx = canvas.getContext('2d');
+// ── Canvas ──────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const can = $('gcanv'), cx = can.getContext('2d');
+let sw = BW, sh = BH;  // actual pixel size
 
-function resizeCanvas() {
-  const wrap = document.getElementById('canvas-wrapper');
-  const WW = window.innerWidth, WH = window.innerHeight;
-  let cw = WW, ch = WW * (BASE_H / BASE_W);
-  if (ch > WH) { ch = WH; cw = WH * (BASE_W / BASE_H); }
-  cw = Math.floor(cw); ch = Math.floor(ch);
-  wrap.style.width = cw + 'px'; wrap.style.height = ch + 'px';
-  canvas.style.width = cw + 'px'; canvas.style.height = ch + 'px';
-  canvas.width = BASE_W; canvas.height = BASE_H;
+function resz() {
+  const ww = window.innerWidth, wh = window.innerHeight;
+  // fit 4:3 canvas to window
+  let w = ww, h = ww * (BH / BW);
+  if (h > wh) { h = wh; w = wh * (BW / BH); }
+  w = Math.floor(w); h = Math.floor(h);
+  sw = w; sh = h;
+  $('cwrap').style.width = w + 'px';
+  $('cwrap').style.height = h + 'px';
+  can.style.width = w + 'px';
+  can.style.height = h + 'px';
+  can.width = BW; can.height = BH;
 }
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
+window.addEventListener('resize', resz);
+resz();
 
-// ===== AUDIO =====
-let audioCtx = null;
-function getAudio() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-  return audioCtx;
+// ── Audio ───────────────────────────────────────────────
+let ac = null;
+function acx() {
+  if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
+  if (ac.state === 'suspended') ac.resume();
+  return ac;
 }
-function tone(freq, type='sine', dur=0.2, vol=0.3, delay=0) {
+function tn(f, t='sine', d=0.2, v=0.3, dl=0) {
   try {
-    const c = getAudio();
-    const o = c.createOscillator(), g = c.createGain();
+    const c = acx(), o = c.createOscillator(), g = c.createGain();
     o.connect(g); g.connect(c.destination);
-    o.type = type; o.frequency.setValueAtTime(freq, c.currentTime + delay);
-    g.gain.setValueAtTime(vol, c.currentTime + delay);
-    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + delay + dur);
-    o.start(c.currentTime + delay); o.stop(c.currentTime + delay + dur);
+    o.type = t; o.frequency.setValueAtTime(f, c.currentTime + dl);
+    g.gain.setValueAtTime(v, c.currentTime + dl);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dl + d);
+    o.start(c.currentTime + dl); o.stop(c.currentTime + dl + d);
   } catch(e) {}
 }
-function noise(dur=0.2, vol=0.4) {
+function ns(d=0.2, v=0.4) {
   try {
-    const c = getAudio();
-    const buf = c.createBuffer(1, c.sampleRate * dur, c.sampleRate);
-    const d = buf.getChannelData(0);
-    for (let i = 0; i < d.length; i++) d[i] = (Math.random()*2-1) * Math.exp(-i/(c.sampleRate*0.04));
-    const src = c.createBufferSource(), g = c.createGain();
-    src.buffer = buf; src.connect(g); g.connect(c.destination);
-    g.gain.setValueAtTime(vol, c.currentTime); src.start();
+    const c = acx(), b = c.createBuffer(1, c.sampleRate * d, c.sampleRate);
+    const dat = b.getChannelData(0);
+    for (let i = 0; i < dat.length; i++) dat[i] = (Math.random()*2-1) * Math.exp(-i/(c.sampleRate*0.04));
+    const s = c.createBufferSource(), g = c.createGain();
+    s.buffer = b; s.connect(g); g.connect(c.destination); g.gain.setValueAtTime(v, c.currentTime); s.start();
   } catch(e) {}
 }
-const playCollectStar   = () => { tone(523,'sine',0.1,0.35); tone(659,'sine',0.1,0.25,0.08); tone(784,'sine',0.15,0.2,0.16); };
-const playCrash         = () => { tone(80,'sawtooth',0.35,0.5); noise(0.25,0.45); };
-const playStart         = () => [261,329,392,523].forEach((f,i) => tone(f,'sine',0.18,0.3,i*0.12));
-const playPause         = () => tone(440,'sine',0.2,0.25);
-const playParkingSuccess= () => [523,659,784,1047].forEach((f,i) => tone(f,'sine',0.22,0.3,i*0.13));
-const playBoost         = () => tone(220,'sawtooth',0.08,0.15);
-const playLevelUp       = () => [392,494,587,784].forEach((f,i) => tone(f,'sine',0.15,0.25,i*0.1));
+const sCol = () => { tn(523); tn(659,'sine',0.1,0.25,0.08); tn(784,'sine',0.15,0.2,0.16); };
+const sCras = () => { tn(80,'sawtooth',0.35,0.5); ns(0.25,0.45); };
+const sStrt = () => [261,329,392,523].forEach((f,i) => tn(f,'sine',0.18,0.3,i*0.12));
+const sPaus = () => tn(440,'sine',0.2,0.25);
+const sSucc = () => [523,659,784,1047].forEach((f,i) => tn(f,'sine',0.22,0.3,i*0.13));
+const sBst   = () => tn(220,'sawtooth',0.08,0.15);
+const sDiff = () => [392,494,587,784].forEach((f,i) => tn(f,'sine',0.15,0.25,i*0.1));
 
-// ===== INPUT =====
-const keys = {};
-const gamepad = { left:false, right:false, up:false, down:false, action:false, pause:false };
-let pauseKeyHeld = false;
-let gamepadInterval = null;
+// ── Input ───────────────────────────────────────────────
+const K = {};
+const GP = { left:false, right:false, up:false, down:false, A:false, P:false };
+let pkHeld = false, gpInt = null;
 
-document.addEventListener('keydown', e => { keys[e.code] = true; e.preventDefault(); });
-document.addEventListener('keyup',   e => { keys[e.code] = false; });
+document.addEventListener('keydown', e => { K[e.code] = true; e.preventDefault(); });
+document.addEventListener('keyup',   e => { K[e.code] = false; });
 
-function pollGamepad() {
+function pollGP() {
   const gp = navigator.getGamepads ? navigator.getGamepads()[0] : null;
   if (!gp) return;
-  gamepad.left   = gp.axes[0] < -0.5  || (gp.buttons[14]?.pressed);
-  gamepad.right  = gp.axes[0] >  0.5  || (gp.buttons[15]?.pressed);
-  gamepad.up     = gp.axes[1] < -0.5  || (gp.buttons[12]?.pressed);
-  gamepad.down   = gp.axes[1] >  0.5  || (gp.buttons[13]?.pressed);
-  gamepad.action = gp.buttons[0]?.pressed || gp.buttons[1]?.pressed;
-  gamepad.pause  = gp.buttons[9]?.pressed;
+  GP.left  = gp.axes[0] < -0.5 || !!gp.buttons[14]?.pressed;
+  GP.right = gp.axes[0] >  0.5 || !!gp.buttons[15]?.pressed;
+  GP.up    = gp.axes[1] < -0.5 || !!gp.buttons[12]?.pressed;
+  GP.down  = gp.axes[1] >  0.5 || !!gp.buttons[13]?.pressed;
+  GP.A     = !!gp.buttons[0]?.pressed || !!gp.buttons[1]?.pressed;
+  GP.P     = !!gp.buttons[9]?.pressed;
 }
-function startGamepad() {
-  if (gamepadInterval) clearInterval(gamepadInterval);
-  gamepadInterval = setInterval(pollGamepad, 16);
+function startGP() { if (gpInt) clearInterval(gpInt); gpInt = setInterval(pollGP, 16); }
+window.addEventListener('gamepadconnected', startGP);
+
+const L = () => K['ArrowLeft']  || K['KeyA'] || GP.left;
+const R = () => K['ArrowRight'] || K['KeyD'] || GP.right;
+const U = () => K['ArrowUp']    || K['KeyW'] || GP.up;
+const Dn= () => K['ArrowDown']  || K['KeyS'] || GP.down;
+const Act=() => K['Space'] || GP.A;
+const Pau=() => K['KeyP'] || K['Escape'] || GP.P;
+
+// D-pad buttons
+function dpad(id, code) {
+  const b = $(id);
+  if (!b) return;
+  const on = () => { K[code] = true; b.classList.add('ps'); };
+  const off = () => { K[code] = false; b.classList.remove('ps'); };
+  b.addEventListener('touchstart', e => { e.preventDefault(); on(); }, { passive: false });
+  b.addEventListener('touchend',   e => { e.preventDefault(); off(); }, { passive: false });
+  b.addEventListener('mousedown', on);
+  b.addEventListener('mouseup', off);
+  b.addEventListener('mouseleave', off);
 }
-window.addEventListener('gamepadconnected', startGamepad);
+dpad('bleft','ArrowLeft'); dpad('bright','ArrowRight');
+dpad('bup','ArrowUp');    dpad('bdown','ArrowDown');
 
-function isLeft()  { return keys['ArrowLeft']  || keys['KeyA'] || gamepad.left; }
-function isRight() { return keys['ArrowRight'] || keys['KeyD'] || gamepad.right; }
-function isUp()    { return keys['ArrowUp']    || keys['KeyW'] || gamepad.up; }
-function isDown()  { return keys['ArrowDown']  || keys['KeyS'] || gamepad.down; }
-function isAction(){ return keys['Space'] || gamepad.action; }
-function isPause() { return keys['KeyP'] || keys['Escape'] || gamepad.pause; }
-
-// Mobile D-pad
-function setupDpad() {
-  const map = { 'btn-left':'ArrowLeft','btn-right':'ArrowRight','btn-up':'ArrowUp','btn-down':'ArrowDown' };
-  Object.entries(map).forEach(([id, code]) => {
-    const btn = document.getElementById(id);
-    if (!btn) return;
-    const press = () => { keys[code] = true; btn.classList.add('pressed'); };
-    const release = () => { keys[code] = false; btn.classList.remove('pressed'); };
-    btn.addEventListener('touchstart', e => { e.preventDefault(); press(); }, { passive: false });
-    btn.addEventListener('touchend',   e => { e.preventDefault(); release(); }, { passive: false });
-    btn.addEventListener('mousedown', press);
-    btn.addEventListener('mouseup', release);
-    btn.addEventListener('mouseleave', release);
-  });
-
-  // Half-screen tap: left half = move left, right half = move right (race only)
-  canvas.addEventListener('click', e => {
-    if (currentState !== State.PLAYING || currentGame !== 'race') return;
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    if (x < 0.4) { keys['ArrowLeft'] = true; setTimeout(() => keys['ArrowLeft'] = false, 80); }
-    else if (x > 0.6) { keys['ArrowRight'] = true; setTimeout(() => keys['ArrowRight'] = false, 80); }
-  });
-}
-
-// On-screen pause button
-document.getElementById('ctrl-pause')?.addEventListener('click', () => {
-  if (currentState === State.PLAYING) doPause();
-  else if (currentState === State.PAUSED) resumeGame();
+// Half-screen tap for race
+can.addEventListener('click', e => {
+  if (state !== ST.PLAY || game !== 'race') return;
+  const x = (e.clientX - can.getBoundingClientRect().left) / sw;
+  if (x < 0.38) { K['ArrowLeft'] = true; setTimeout(() => K['ArrowLeft'] = false, 90); }
+  else if (x > 0.62) { K['ArrowRight'] = true; setTimeout(() => K['ArrowRight'] = false, 90); }
 });
 
-// ===== NAVIGATION =====
-function navigate(screen) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const el = document.getElementById('screen-' + screen);
-  if (el) el.classList.add('active');
-  currentState = screen === 'home' ? State.MENU : State.MODE_SELECT;
-  currentGame = null;
+// On-screen pause
+$('gpause').addEventListener('click', () => {
+  if (state === ST.PLAY) pauseG();
+  else if (state === ST.PAUS) resm();
+});
+
+// ── Screen nav ──────────────────────────────────────────
+function nav(id) {
+  document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
+  if (id === 'home') { $('shome').classList.add('on'); state = ST.MENU; game = null; return; }
+  if (id === 'mrace') { $('smrace').classList.add('on'); state = ST.MODSEL; game = null; return; }
+  if (id === 'mpark') { buildLG(); $('smpark').classList.add('on'); state = ST.MODSEL; game = null; return; }
 }
 
-function showOverlay(id) {
-  ['overlay-pause','overlay-gameover','overlay-levelcomplete','overlay-start'].forEach(o => {
-    document.getElementById(o).classList.remove('active');
-  });
-  if (id) document.getElementById(id).classList.add('active');
-}
-
-function doPause() {
-  if (currentState !== State.PLAYING) return;
-  currentState = State.PAUSED;
-  stopGameLoop();
-  playPause();
-  document.getElementById('pause-title').textContent = currentGame === 'race' ? 'RACE PAUSED' : 'PARKING PAUSED';
-  showOverlay('overlay-pause');
-}
-
-function resumeGame() {
-  if (currentState !== State.PAUSED) return;
-  currentState = State.PLAYING;
-  showOverlay(null);
-  startGameLoop();
-}
-
-function exitToHome() {
-  stopGameLoop();
-  currentState = State.MENU;
-  currentGame = null;
-  showOverlay(null);
-  document.getElementById('game-controls').style.display = 'none';
-  navigate('home');
-}
-
-function buildParkingLevelGrid() {
-  const grid = document.getElementById('park-level-grid');
-  grid.innerHTML = '';
+function buildLG() {
+  const g = $('lgrid');
+  g.innerHTML = '';
   for (let i = 1; i <= 10; i++) {
-    const btn = document.createElement('button');
-    btn.className = 'level-btn';
-    btn.textContent = i;
-    btn.onclick = () => startGame('park', i);
-    grid.appendChild(btn);
+    const b = document.createElement('button');
+    b.className = 'lbtn'; b.textContent = i;
+    b.onclick = () => launch('park', i);
+    g.appendChild(b);
   }
 }
-buildParkingLevelGrid();
 
-// ===== GAME LAUNCH =====
-function startGame(type, level = 1) {
-  currentGame = type;
-  activeLevel = level;
-  showOverlay(null);
-  document.getElementById('canvas-wrapper').style.display = 'flex';
-  document.getElementById('game-controls').style.display = 'flex';
-  document.getElementById('dpad').style.display = 'grid';
+function showOvid(id) {
+  ['ovpause','ovover','ovwin','ovstart'].forEach(o => $(o).classList.remove('on'));
+  if (id) $(id).classList.add('on');
+}
 
-  document.getElementById('race-hud').style.display = type === 'race' ? 'flex' : 'none';
-  document.getElementById('park-hud').style.display = type === 'park' ? 'flex' : 'none';
-  document.getElementById('timer-bar-wrap').style.display = type === 'park' ? 'block' : 'none';
+// ── Game launch ─────────────────────────────────────────
+function launch(type, level = 1) {
+  game = type; lvl = level;
+  showOvid(null);
+  $('cwrap').style.display = 'flex';
+  $('gbtns').style.display = 'flex';
+  $('dpad').style.display = 'grid';
+  $('rjhud').style.display = type === 'race' ? 'flex' : 'none';
+  $('pjhud').style.display = type === 'park'  ? 'flex' : 'none';
+  $('tbw').style.display   = type === 'park'  ? 'block' : 'none';
+  $('sgame').classList.add('on');
+  $('shome').classList.remove('on');
+  $('smrace').classList.remove('on');
+  $('smpark').classList.remove('on');
+  state = ST.MODSEL; // will go to START on countdown
 
   if (type === 'race') Race.init();
   else Parking.init(level);
 
-  navigate('game');
-  startCountdown(type === 'race' ? 3 : 2);
+  cdwn(type === 'race' ? 3 : 2);
 }
 
-function restartGame() {
-  showOverlay(null);
-  if (currentGame === 'race') { Race.init(); startCountdown(3); }
-  else { Parking.init(activeLevel); startCountdown(2); }
-}
-
-function nextLevel() {
-  showOverlay(null);
-  activeLevel++;
-  if (activeLevel > 10) { exitToHome(); return; }
-  Parking.init(activeLevel);
-  startCountdown(2);
-}
-
-function startCountdown(n) {
-  currentState = State.STARTING;
-  const ov = document.getElementById('overlay-start');
-  const title = document.getElementById('start-title');
-  const counter = document.getElementById('start-countdown');
-  title.textContent = currentGame === 'race' ? 'GET READY!' : `LEVEL ${activeLevel}`;
-  ov.classList.add('active');
-  let count = n; counter.textContent = count; playStart();
-  const tick = setInterval(() => {
-    count--;
-    if (count <= 0) {
-      clearInterval(tick); ov.classList.remove('active');
-      currentState = State.PLAYING; startGameLoop();
-    } else { counter.textContent = count; }
+// ── Countdown ───────────────────────────────────────────
+function cdwn(n) {
+  state = ST.START;
+  showOvid('ovstart');
+  $('stit').textContent = game === 'race' ? 'GET READY!' : `LEVEL ${lvl}`;
+  let c = n; $('scnt').textContent = c; sStrt();
+  const iv = setInterval(() => {
+    c--;
+    if (c <= 0) { clearInterval(iv); showOvid(null); state = ST.PLAY; gl(); }
+    else $('scnt').textContent = c;
   }, 1000);
 }
 
-// ===== GAME LOOP =====
-let rafId = null, lastTime = 0, accumulator = 0;
-const FIXED_DT = 1 / 60;
+// ── Loop ────────────────────────────────────────────────
+let raf = null, lt = 0, acc = 0;
+const DT = 1 / 60;
 
-function startGameLoop() {
-  lastTime = performance.now(); accumulator = 0;
-  if (rafId) cancelAnimationFrame(rafId);
-  rafId = requestAnimationFrame(loop);
+function gl() {
+  if (raf) cancelAnimationFrame(raf);
+  lt = performance.now(); acc = 0;
+  raf = requestAnimationFrame(loop);
 }
-function stopGameLoop() { if (rafId) cancelAnimationFrame(rafId); rafId = null; }
+function stop() { if (raf) cancelAnimationFrame(raf); raf = null; }
 
 function loop(ts) {
-  const dt = Math.min((ts - lastTime) / 1000, 0.1);
-  lastTime = ts;
+  const dt = Math.min((ts - lt) / 1000, 0.1);
+  lt = ts;
 
-  if (currentState === State.PLAYING) {
-    accumulator += dt;
-    while (accumulator >= FIXED_DT) {
-      if (currentGame === 'race') Race.update(FIXED_DT);
-      else if (currentGame === 'park') Parking.update(FIXED_DT);
-      accumulator -= FIXED_DT;
+  if (state === ST.PLAY) {
+    acc += dt;
+    while (acc >= DT) {
+      if (game === 'race') Race.u(DT);
+      else if (game === 'park') Parking.u(DT);
+      acc -= DT;
     }
-    if (isPause() && !pauseKeyHeld) { pauseKeyHeld = true; doPause(); }
-  } else if (currentState === State.PAUSED) {
-    if (isPause()) pauseKeyHeld = true;
-    else if (pauseKeyHeld) {
-      pauseKeyHeld = false;
-      if (!keys['KeyP'] && !keys['Escape'] && !gamepad.pause) resumeGame();
+    if (Pau() && !pkHeld) { pkHeld = true; pauseG(); }
+  } else if (state === ST.PAUS) {
+    if (Pau()) pkHeld = true;
+    else if (pkHeld) {
+      pkHeld = false;
+      if (!K['KeyP'] && !K['Escape'] && !GP.P) resm();
     }
   }
 
-  if (currentGame === 'race') Race.render();
-  else if (currentGame === 'park') Parking.render();
+  if (game === 'race') Race.r();
+  else if (game === 'park') Parking.r();
 
-  if (currentState !== State.MENU && currentState !== State.MODE_SELECT)
-    rafId = requestAnimationFrame(loop);
+  if (state !== ST.MENU && state !== ST.MODSEL) raf = requestAnimationFrame(loop);
 }
 
-// ===== RACE GAME =====
-const Race = (() => {
-  const LANE_W = BASE_W / LANE_COUNT;
-  // Car dimensions: wide rectangle (side-view, car drives left/right across screen)
-  const CAR_W = LANE_W * 0.78;   // length along road = wide
-  const CAR_H = CAR_W * 0.52;    // width across = narrower
-  const PLAYER_Y_RATIO = 0.72;   // player drives in bottom portion
-  const ENEMY_COLORS = ['#e74c3c','#2ecc71','#3498db','#f39c12','#e91e63','#00bcd4'];
+// ── Controls ─────────────────────────────────────────────
+function pauseG() { if (state !== ST.PLAY) return; state = ST.PAUS; stop(); sPaus(); $('ptit').textContent = game === 'race' ? 'RACE PAUSED' : 'PARKING PAUSED'; showOvid('ovpause'); }
+function resm()  { if (state !== ST.PAUS) return; state = ST.PLAY; showOvid(null); gl(); }
+function rest()  { showOvid(null); if (game === 'race') { Race.init(); cdwn(3); } else { Parking.init(lvl); cdwn(2); } }
+function exith()  { stop(); state = ST.MENU; game = null; showOvid(null); $('gbtns').style.display = 'none'; nav('home'); }
+function nxLvl()  { showOvid(null); lvl++; if (lvl > 10) { exith(); return; } Parking.init(lvl); cdwn(2); }
 
-  let lives, score, baseSpeed, currentLane, graceTimer;
-  let enemies=[], stars=[], particles=[];
-  let lastSpawn=0, lastStarSpawn=0, gameOver=false, invincible=0;
-  let diffTimer=0, diffLevel=0, boost=100, boosting=false;
+// ════════════════════════════════════════════════════════
+//  R A C E   G A M E
+// ════════════════════════════════════════════════════════
+const Race = (() => {
+  const LW = BW / Lanes;
+  // Car: wide rectangle (side view)
+  const CW = LW * 0.8;   // width along road (long axis)
+  const CH = CW * 0.52;   // height/thickness (short axis)
+  const PY = BH * 0.72;   // player Y fixed position
+  const ECOL = ['#e74c3c','#2ecc71','#3498db','#f39c12','#e91e63','#00bcd4'];
+
+  let Lv, Sco, Spd, CL, Grc, En=[], St=[], Pt=[];
+  let lsTm=0, lsSt=0, ov=false, inv=0, dT=0, dL=0, bst=100, bstA=false;
 
   function init() {
-    lives=2; score=0; baseSpeed=180; currentLane=1; // Start in lane 1 (middle of 3 left lanes)
-    graceTimer=3; enemies=[]; stars=[]; particles=[];
-    gameOver=false; invincible=0; lastSpawn=0; lastStarSpawn=0;
-    diffTimer=0; diffLevel=0; boost=100; boosting=false;
-    updateHUD(); updateBoostBar();
+    Lv=2; Sco=0; Spd=180; CL=1; Grc=3;
+    En=[]; St=[]; Pt=[]; ov=false; inv=0; dT=0; dL=0; bst=100; bstA=false;
+    lsTm=0; lsSt=0;
+    hud();
   }
 
-  function currentSpeed() {
-    return baseSpeed + diffLevel * 25;
-  }
+  function u(dt) {
+    if (ov) return;
+    if (Grc > 0) { Grc -= dt; }
+    else { Sco += dt; }
 
-  function update(dt) {
-    if (gameOver) return;
-
-    if (graceTimer > 0) { graceTimer -= dt; }
-    else { score += dt; }
-
-    // Difficulty ramp: every 20s
-    diffTimer += dt;
-    if (diffTimer >= 20) {
-      diffTimer = 0;
-      diffLevel++;
-      playLevelUp();
-    }
+    // Diff ramp every 20s
+    dT += dt;
+    if (dT >= 20) { dT = 0; dL++; sDiff(); }
 
     // Boost
-    if (isAction() && boost > 0) {
-      boosting = true; boost = Math.max(0, boost - dt * 35);
-      if (Math.floor(boost * 4) % 2 === 0) playBoost();
-    } else {
-      boosting = false; boost = Math.min(100, boost + dt * 12);
-    }
-    updateBoostBar();
+    if (Act() && bst > 0) { bstA = true; bst = Math.max(0, bst - dt * 35); if (Math.floor(bst*3) % 2 === 0) sBst(); }
+    else { bstA = false; bst = Math.min(100, bst + dt * 12); }
+    $('bfil').style.width = bst + '%';
 
     // Lane snap
-    if (isLeft()  && currentLane > 0) { currentLane--; keys['ArrowLeft']=false; keys['KeyA']=false; }
-    if (isRight() && currentLane < LANE_COUNT-1) { currentLane++; keys['ArrowRight']=false; keys['KeyD']=false; }
+    if (L() && CL > 0) { CL--; K['ArrowLeft']=false; K['KeyA']=false; }
+    if (R() && CL < Lanes-1) { CL++; K['ArrowRight']=false; K['KeyD']=false; }
 
-    const speed = boosting ? currentSpeed() * 1.6 : currentSpeed();
+    const esp = Spd + dL * 25;
+    const sp = bstA ? esp * 1.6 : esp;
 
-    // Spawn enemies
-    const spawnInt = Math.max(0.3, 1.8 - diffLevel * 0.12 - (boosting ? 0.2 : 0));
-    lastSpawn -= dt;
-    if (lastSpawn <= 0) { spawnEnemy(speed); lastSpawn = spawnInt; }
+    // Spawn
+    lsTm -= dt; if (lsTm <= 0) { sE(sp); lsTm = Math.max(0.28, 1.75 - dL * 0.11 - (bstA ? 0.2 : 0)); }
+    lsSt -= dt; if (lsSt <= 0) { sS(sp * 0.9); lsSt = 2.5 + Math.random() * 2.5; }
 
-    // Spawn stars
-    lastStarSpawn -= dt;
-    if (lastStarSpawn <= 0) { spawnStar(speed * 0.9); lastStarSpawn = 2.5 + Math.random() * 2.5; }
+    if (inv > 0) inv -= dt;
 
-    if (invincible > 0) invincible -= dt;
+    const sm = bstA ? 1.6 : 1;
+    En.forEach(e => { e.y += e.vy * sm * dt; });
+    En = En.filter(e => e.y > -CH*2 && e.y < BH + CH*2);
+    St.forEach(s => { s.y += s.vy * sm * dt; s.g += dt * 4; });
+    St = St.filter(s => s.y < BH + 50 && !s.c);
+    Pt.forEach(p => { p.x += p.vx*dt; p.y += p.vy*dt; p.l -= dt*2.5; });
+    Pt = Pt.filter(p => p.l > 0);
 
-    const speedMult = boosting ? 1.6 : 1;
-    enemies.forEach(e => { e.y += e.vy * speedMult * dt; });
-    enemies = enemies.filter(e => e.y > -CAR_H*2 && e.y < BASE_H + CAR_H*2);
+    const px = CL * LW + LW/2;
+    const py = PY;
+    const hw = bstA ? CW*0.88 : CW*0.74;
+    const hh = bstA ? CH*0.88 : CH*0.74;
 
-    stars.forEach(s => { s.y += s.vy * speedMult * dt; s.glow += dt * 4; });
-    stars = stars.filter(s => s.y < BASE_H + 50 && !s.collected);
-
-    particles.forEach(p => { p.x += p.vx*dt; p.y += p.vy*dt; p.life -= dt*2.5; });
-    particles = particles.filter(p => p.life > 0);
-
-    // Collisions
-    const px = currentLane * LANE_W + LANE_W/2;
-    const py = BASE_H * PLAYER_Y_RATIO;
-    const hitW = boosting ? CAR_W*0.9 : CAR_W*0.75;
-    const hitH = boosting ? CAR_H*0.9 : CAR_H*0.75;
-
-    if (invincible <= 0) {
-      for (const e of enemies) {
-        if (Math.abs(px-e.x) < (hitW+e.w*0.75)/2 && Math.abs(py-e.y) < (hitH+e.h*0.75)/2) {
-          lives--; invincible=1.5; burst(px,py,'#e94560',12); playCrash();
-          if (lives <= 0) { gameOver=true; triggerGameOver(); }
-          updateHUD(); break;
+    if (inv <= 0) {
+      for (const e of En) {
+        if (Math.abs(px-e.x) < (hw+e.w*0.74)/2 && Math.abs(py-e.y) < (hh+e.h*0.74)/2) {
+          Lv--; inv=1.5; bx(px,py,'#e94560',12); sCras();
+          if (Lv<=0) { ov=true; og(); }
+          hud(); break;
         }
       }
     }
-
-    for (const s of stars) {
-      if (!s.collected && Math.abs(px-s.x) < (CAR_W+s.r)/2 && Math.abs(py-s.y) < (CAR_H+s.r)/2) {
-        s.collected=true; lives++; burst(s.x,s.y,'#ffd700',6); playCollectStar();
+    for (const s of St) {
+      if (!s.c && Math.abs(px-s.x) < (CW+s.r)/2 && Math.abs(py-s.y) < (CH+s.r)/2) {
+        s.c=true; Lv++; bx(s.x,s.y,'#ffd700',6); sCol();
       }
     }
-
-    updateHUD();
+    hud();
   }
 
-  // Lanes 0,1,2 → traffic flows DOWN (same direction as player)
-  // Lanes 3,4,5 → traffic comes UP from bottom (oncoming)
-  function spawnEnemy(speed) {
-    // Decide direction group
-    const oncoming = Math.random() < 0.5;
-    let lane;
-    if (oncoming) lane = 3 + Math.floor(Math.random() * 3); // right 3 lanes: oncoming
-    else lane = Math.floor(Math.random() * 3);              // left 3 lanes: with traffic
-
-    enemies.push({
-      lane, x: lane * LANE_W + LANE_W/2,
-      y: lane < 3 ? -CAR_H : BASE_H + CAR_H,
-      vy: lane < 3 ? speed : -speed,
-      w: CAR_W, h: CAR_H,
-      color: ENEMY_COLORS[Math.floor(Math.random() * ENEMY_COLORS.length)],
-      fromTop: lane < 3
+  // Lanes 0-2: traffic flows DOWN (with player)
+  // Lanes 3-5: traffic comes UP (oncoming)
+  function sE(sp) {
+    const onc = Math.random() < 0.5;
+    const ln = onc ? 3 + Math.floor(Math.random()*3) : Math.floor(Math.random()*3);
+    En.push({
+      x: ln*LW + LW/2,
+      y: ln < 3 ? -CH : BH + CH,
+      vy: ln < 3 ? sp : -sp,
+      w: CW, h: CH,
+      c: ECOL[Math.floor(Math.random()*ECOL.length)],
+      dn: ln < 3
     });
   }
 
-  function spawnStar(speed) {
-    // Stars only appear in the left 3 lanes (player's area)
-    const lane = Math.floor(Math.random() * 3);
-    stars.push({
-      lane, x: lane * LANE_W + LANE_W/2, y: -30,
-      vy: speed, r: Math.max(13, LANE_W * 0.13),
-      glow: 0, collected: false
-    });
+  function sS(sp) {
+    const ln = Math.floor(Math.random() * 3);  // stars only in left 3 lanes
+    St.push({ x: ln*LW+LW/2, y: -30, vy: sp, r: Math.max(12, LW*0.13), g: 0, c: false });
   }
 
-  function burst(x, y, color, n) {
+  function bx(x, y, col, n) {
     for (let i = 0; i < n; i++) {
       const a = Math.random() * Math.PI * 2;
       const v = 50 + Math.random() * 150;
-      particles.push({ x, y, vx: Math.cos(a)*v, vy: Math.sin(a)*v, life: 1, color });
+      Pt.push({ x, y, vx: Math.cos(a)*v, vy: Math.sin(a)*v, l: 1, col });
     }
   }
 
-  function render() {
-    ctx.fillStyle = '#1a1a2e'; ctx.fillRect(0,0,BASE_W,BASE_H);
-    ctx.fillStyle = '#2c2c3e'; ctx.fillRect(0,0,BASE_W,BASE_H);
+  function r() {
+    cx.fillStyle = '#1a1a2e'; cx.fillRect(0, 0, BW, BH);
+    cx.fillStyle = '#2c2c3e'; cx.fillRect(0, 0, BW, BH);
 
-    // Shoulder/verge
-    ctx.fillStyle = '#444'; ctx.fillRect(0,0,10,BASE_H); ctx.fillRect(BASE_W-10,0,10,BASE_H);
+    // Verge
+    cx.fillStyle = '#3a3a4e'; cx.fillRect(0, 0, 10, BH); cx.fillRect(BW-10, 0, 10, BH);
 
     // Dashed lane dividers
-    ctx.strokeStyle='rgba(255,255,255,0.4)'; ctx.lineWidth=2; ctx.setLineDash([28,18]);
-    for (let i=1; i<LANE_COUNT; i++) {
-      ctx.beginPath(); ctx.moveTo(i*LANE_W,0); ctx.lineTo(i*LANE_W,BASE_H); ctx.stroke();
-    }
-    ctx.setLineDash([]);
+    cx.strokeStyle = 'rgba(255,255,255,0.38)'; cx.lineWidth = 2; cx.setLineDash([26,17]);
+    for (let i = 1; i < Lanes; i++) { cx.beginPath(); cx.moveTo(i*LW,0); cx.lineTo(i*LW,BH); cx.stroke(); }
+    cx.setLineDash([]);
 
-    // Centre dividing line (double yellow)
-    ctx.strokeStyle='rgba(255,215,0,0.5)'; ctx.lineWidth=3;
-    ctx.beginPath(); ctx.moveTo(BASE_W/2,0); ctx.lineTo(BASE_W/2,BASE_H); ctx.stroke();
+    // Centre double-yellow
+    cx.strokeStyle = 'rgba(255,215,0,0.45)'; cx.lineWidth = 3;
+    cx.beginPath(); cx.moveTo(BW/2,0); cx.lineTo(BW/2,BH); cx.stroke();
 
-    // Direction arrows on road
-    ctx.fillStyle='rgba(255,255,255,0.07)'; ctx.font='bold 28px sans-serif'; ctx.textAlign='center';
-    for (let l=0; l<3; l++) { // left lanes: down arrows
-      const cx2 = l*LANE_W + LANE_W/2;
-      for (let row=0; row<3; row++) {
-        const ay = row * (BASE_H/3) + (BASE_H/6);
-        ctx.fillText('▼', cx2, ay);
-      }
+    // Direction arrows
+    cx.fillStyle = 'rgba(255,255,255,0.06)'; cx.font = 'bold 26px sans-serif'; cx.textAlign = 'center';
+    for (let ln = 0; ln < 3; ln++) {
+      const cx2 = ln*LW + LW/2;
+      for (let row = 0; row < 3; row++) cx.fillText('▼', cx2, row*(BH/3) + BH/5.5);
     }
-    for (let l=3; l<6; l++) { // right lanes: up arrows
-      const cx2 = l*LANE_W + LANE_W/2;
-      for (let row=0; row<3; row++) {
-        const ay = row * (BASE_H/3) + (BASE_H/6);
-        ctx.fillText('▲', cx2, ay);
-      }
+    for (let ln = 3; ln < 6; ln++) {
+      const cx2 = ln*LW + LW/2;
+      for (let row = 0; row < 3; row++) cx.fillText('▲', cx2, row*(BH/3) + BH/5.5);
     }
 
     // Stars
-    stars.forEach(s => {
-      if (s.collected) return;
-      ctx.save(); ctx.translate(s.x, s.y);
-      ctx.fillStyle='#ffd700'; ctx.shadowBlur=12+Math.sin(s.glow)*5; ctx.shadowColor='#ffd700';
-      ctx.beginPath();
-      for (let i=0; i<5; i++) {
-        const a=(i*4*Math.PI/5)-Math.PI/2, b=((i*4+2)*Math.PI/5)-Math.PI/2;
-        if(i===0) ctx.moveTo(Math.cos(a)*s.r,Math.sin(a)*s.r);
-        else ctx.lineTo(Math.cos(a)*s.r,Math.sin(a)*s.r);
-        ctx.lineTo(Math.cos(b)*s.r*0.5,Math.sin(b)*s.r*0.5);
+    St.forEach(s => {
+      if (s.c) return;
+      cx.save(); cx.translate(s.x, s.y);
+      cx.fillStyle = '#ffd700'; cx.shadowBlur = 11 + Math.sin(s.g)*5; cx.shadowColor = '#ffd700';
+      cx.beginPath();
+      for (let i = 0; i < 5; i++) {
+        const a = (i*4*Math.PI/5)-Math.PI/2, b = ((i*4+2)*Math.PI/5)-Math.PI/2;
+        if (i===0) cx.moveTo(Math.cos(a)*s.r, Math.sin(a)*s.r);
+        else cx.lineTo(Math.cos(a)*s.r, Math.sin(a)*s.r);
+        cx.lineTo(Math.cos(b)*s.r*0.5, Math.sin(b)*s.r*0.5);
       }
-      ctx.closePath(); ctx.fill(); ctx.restore();
+      cx.closePath(); cx.fill(); cx.restore();
     });
 
-    // Enemies — wide rectangle (side view), angle 0 = facing down (for top-half spawn), PI = facing up
-    enemies.forEach(e => drawCar(e.x, e.y, e.w, e.h, e.color, e.fromTop ? 0 : Math.PI));
+    // Enemies
+    En.forEach(e => dC(e.x, e.y, e.w, e.h, e.c, e.dn ? 0 : Math.PI));
 
-    // Player — purple, wider than tall
-    const px = currentLane * LANE_W + LANE_W/2;
-    const py = BASE_H * PLAYER_Y_RATIO;
-    const flash = invincible>0 && Math.floor(invincible*12)%2===0;
-    drawCar(px, py, CAR_W, CAR_H, flash ? '#ffffff' : '#9b59b6', 0, !boosting);
+    // Player
+    const px = CL*LW+LW/2, py = PY;
+    const fl = inv > 0 && Math.floor(inv*12)%2===0;
+    dC(px, py, CW, CH, fl ? '#fff' : '#9b59b6', 0);
 
     // Particles
-    particles.forEach(p => {
-      ctx.globalAlpha=p.life; ctx.fillStyle=p.color;
-      ctx.beginPath(); ctx.arc(p.x,p.y,4*p.life,0,Math.PI*2); ctx.fill();
-    });
-    ctx.globalAlpha=1;
+    Pt.forEach(p => { cx.globalAlpha = p.l; cx.fillStyle = p.col; cx.beginPath(); cx.arc(p.x,p.y,4*p.l,0,Math.PI*2); cx.fill(); });
+    cx.globalAlpha = 1;
 
-    // Diff level indicator
-    if (diffLevel > 0) {
-      ctx.fillStyle='rgba(255,215,0,0.8)'; ctx.font='bold 14px sans-serif'; ctx.textAlign='left';
-      ctx.fillText(`SPD +${diffLevel * 25}`, 16, BASE_H - 14);
-    }
+    // Speed diff indicator
+    if (dL > 0) { cx.fillStyle='rgba(255,215,0,0.75)'; cx.font='bold 13px sans-serif'; cx.textAlign='left'; cx.fillText(`SPD +${dL*25}`, 16, BH-14); }
 
-    // Grace overlay
-    if (graceTimer > 0) {
-      ctx.fillStyle='rgba(0,0,0,0.38)'; ctx.fillRect(0,0,BASE_W,BASE_H);
-      ctx.fillStyle='#fff'; ctx.font='bold 48px sans-serif'; ctx.textAlign='center';
-      ctx.fillText('GET READY!', BASE_W/2, BASE_H*0.46);
-      ctx.font='80px sans-serif'; ctx.fillText(Math.ceil(graceTimer), BASE_W/2, BASE_H*0.6);
+    // Grace
+    if (Grc > 0) {
+      cx.fillStyle='rgba(0,0,0,0.4)'; cx.fillRect(0,0,BW,BH);
+      cx.fillStyle='#fff'; cx.font='bold 46px sans-serif'; cx.textAlign='center';
+      cx.fillText('GET READY!', BW/2, BH*0.45);
+      cx.font='76px sans-serif'; cx.fillText(Math.ceil(Grc), BW/2, BH*0.58);
     }
   }
 
-  // drawCar: wide rectangle for side-view
-  function drawCar(x, y, w, h, color, angle, showBoostGlow=false) {
-    ctx.save(); ctx.translate(x,y); if(angle) ctx.rotate(angle);
-    // Body
-    ctx.fillStyle=color;
-    ctx.beginPath(); ctx.roundRect(-w/2,-h/2,w,h,6); ctx.fill();
-    // Windshield (side window strip)
-    ctx.fillStyle='rgba(26,26,46,0.65)';
-    ctx.fillRect(-w*0.32,-h*0.1,w*0.64,h*0.22);
-    // Headlights (front = top of rect when angle=0)
-    ctx.fillStyle='#fff'; ctx.fillRect(-w*0.35,-h/2+3,w*0.22,5); ctx.fillRect(w*0.13,-h/2+3,w*0.22,5);
-    // Taillights
-    ctx.fillStyle='#ff3333'; ctx.fillRect(-w*0.35,h/2-8,w*0.22,5); ctx.fillRect(w*0.13,h/2-8,w*0.22,5);
-    // Boost glow ring
-    if (showBoostGlow) {
-      ctx.shadowBlur=0;
-    }
-    ctx.restore();
+  function dC(x, y, w, h, col, ang) {
+    cx.save(); cx.translate(x,y); if(ang) cx.rotate(ang);
+    cx.fillStyle = col;
+    cx.beginPath(); cx.roundRect(-w/2,-h/2,w,h,6); cx.fill();
+    cx.fillStyle='rgba(26,26,46,0.65)'; cx.fillRect(-w*0.31,-h*0.1,w*0.62,h*0.21);
+    cx.fillStyle='#fff'; cx.fillRect(-w*0.34,-h/2+3,w*0.21,4); cx.fillRect(w*0.13,-h/2+3,w*0.21,4);
+    cx.fillStyle='#ff3333'; cx.fillRect(-w*0.34,h/2-7,w*0.21,4); cx.fillRect(w*0.13,h/2-7,w*0.21,4);
+    cx.restore();
   }
 
-  function updateHUD() {
-    document.getElementById('hud-lives').textContent = '❤️'.repeat(Math.max(0,lives));
-    document.getElementById('hud-score').textContent = Math.floor(score);
-  }
+  function hud() { $('hlives').textContent = '❤️'.repeat(Math.max(0,Lv)); $('hscore').textContent = Math.floor(Sco); }
 
-  function updateBoostBar() {
-    document.getElementById('boost-fill').style.width = boost + '%';
-  }
+  function og() { state = ST.OVER; stop(); $('ovtit').textContent = 'RACE OVER'; $('ovsco').textContent = `Score: ${Math.floor(Sco)}  |  Speed: +${dL*25}`; showOvid('ovover'); }
 
-  function triggerGameOver() {
-    currentState=State.GAME_OVER; stopGameLoop();
-    document.getElementById('go-title').textContent='RACE OVER';
-    document.getElementById('go-score').textContent='Score: '+Math.floor(score)+'  |  Speed Level: '+diffLevel;
-    showOverlay('overlay-gameover');
-  }
-
-  return { init, update, render };
+  return { init, u, r };
 })();
 
-// ===== PARKING GAME =====
+// ════════════════════════════════════════════════════════
+//  P A R K I N G   G A M E
+// ════════════════════════════════════════════════════════
 const Parking = (() => {
-  const CAR_W=40, CAR_H=70; // Top-down: tall rectangle (car length = height)
-  const MAX_LEVEL = 10;
+  const CW = 40, CH = 70; // top-down: tall rectangle
+  const ML = 10;
 
-  // 10 progressively harder levels
-  const levels = [
-    // Level 1: Straight pull-in, wide spots
-    { car:{x:0.5,y:0.88,angle:0}, target:{x:0.5,y:0.14,w:95,h:135,angle:0},
-      obstacles:[{x:0.18,y:0.14,w:60,h:125},{x:0.82,y:0.14,w:60,h:125},{x:0.18,y:0.5,w:60,h:125},{x:0.82,y:0.5,w:60,h:125}],
-      timeLimit:50 },
-    // Level 2: Angled forward park
-    { car:{x:0.5,y:0.9,angle:0}, target:{x:0.25,y:0.22,w:92,h:130,angle:Math.PI/7},
-      obstacles:[{x:0.75,y:0.22,w:65,h:110},{x:0.75,y:0.55,w:65,h:110},{x:0.25,y:0.55,w:65,h:110},{x:0.5,y:0.82,w:210,h:28}],
-      timeLimit:55 },
-    // Level 3: Tight squeeze between pillars
-    { car:{x:0.5,y:0.93,angle:0}, target:{x:0.72,y:0.13,w:88,h:128,angle:0},
-      obstacles:[{x:0.28,y:0.13,w:55,h:118},{x:0.72,y:0.46,w:55,h:118},{x:0.28,y:0.46,w:55,h:118},{x:0.5,y:0.72,w:185,h:26},{x:0.5,y:0.33,w:26,h:195}],
-      timeLimit:65 },
-    // Level 4: Reverse diagonal park
-    { car:{x:0.5,y:0.9,angle:Math.PI}, target:{x:0.7,y:0.12,w:86,h:124,angle:Math.PI/6},
-      obstacles:[{x:0.3,y:0.12,w:52,h:114},{x:0.7,y:0.45,w:52,h:114},{x:0.3,y:0.45,w:52,h:114},{x:0.5,y:0.72,w:175,h:26},{x:0.5,y:0.3,w:26,h:180},{x:0.15,y:0.5,w:28,h:220}],
-      timeLimit:65 },
-    // Level 5: Narrow corridor
-    { car:{x:0.5,y:0.92,angle:0}, target:{x:0.5,y:0.1,w:80,h:120,angle:0},
-      obstacles:[{x:0.22,y:0.1,w:50,h:108},{x:0.78,y:0.1,w:50,h:108},{x:0.22,y:0.44,w:50,h:108},{x:0.78,y:0.44,w:50,h:108},{x:0.5,y:0.7,w:165,h:24},{x:0.5,y:0.32,w:24,h:190},{x:0.15,y:0.27,w:120,h:22},{x:0.15,y:0.7,w:120,h:22}],
-      timeLimit:70 },
-    // Level 6: Double turn
-    { car:{x:0.25,y:0.9,angle:0}, target:{x:0.78,y:0.1,w:82,h:122,angle:0},
-      obstacles:[{x:0.25,y:0.1,w:52,h:112},{x:0.78,y:0.42,w:52,h:112},{x:0.25,y:0.42,w:52,h:112},{x:0.5,y:0.68,w:200,h:24},{x:0.5,y:0.3,w:24,h:200},{x:0.78,y:0.72,w:52,h:112}],
-      timeLimit:75 },
-    // Level 7: Tight L-shape
-    { car:{x:0.5,y:0.92,angle:Math.PI/2}, target:{x:0.14,y:0.14,w:78,h:118,angle:Math.PI/4},
-      obstacles:[{x:0.5,y:0.14,w:55,h:105},{x:0.5,y:0.45,w:55,h:105},{x:0.14,y:0.45,w:55,h:105},{x:0.76,y:0.3,w:55,h:105},{x:0.76,y:0.7,w:55,h:105},{x:0.35,y:0.7,w:160,h:24}],
-      timeLimit:80 },
-    // Level 8: Parallel park
-    { car:{x:0.5,y:0.9,angle:0}, target:{x:0.15,y:0.5,w:75,h:115,angle:0},
-      obstacles:[{x:0.5,y:0.5,w:28,h:240},{x:0.15,y:0.18,w:28,h:140},{x:0.15,y:0.82,w:28,h:140},{x:0.72,y:0.5,w:50,h:100}],
-      timeLimit:85 },
-    // Level 9: Maze-like
-    { car:{x:0.75,y:0.9,angle:Math.PI}, target:{x:0.25,y:0.1,w:74,h:112,angle:0},
-      obstacles:[{x:0.25,y:0.1,w:48,h:105},{x:0.75,y:0.1,w:48,h:105},{x:0.25,y:0.4,w:48,h:105},{x:0.75,y:0.4,w:48,h:105},{x:0.5,y:0.68,w:180,h:22},{x:0.5,y:0.28,w:22,h:200},{x:0.15,y:0.55,w:28,h:200},{x:0.85,y:0.55,w:28,h:200}],
-      timeLimit:90 },
-    // Level 10: The gauntlet
-    { car:{x:0.5,y:0.94,angle:0}, target:{x:0.5,y:0.08,w:70,h:108,angle:0},
-      obstacles:[{x:0.2,y:0.08,w:46,h:100},{x:0.8,y:0.08,w:46,h:100},{x:0.2,y:0.38,w:46,h:100},{x:0.8,y:0.38,w:46,h:100},{x:0.5,y:0.65,w:155,h:22},{x:0.5,y:0.28,w:22,h:185},{x:0.15,y:0.5,w:22,h:190},{x:0.85,y:0.5,w:22,h:190},{x:0.35,y:0.82,w:130,h:22},{x:0.65,y:0.82,w:130,h:22}],
-      timeLimit:100 },
+  const Lvs = [
+    { c:{x:.5,y:.88,a:0}, t:{x:.5,y:.14,w:95,h:135,a:0}, o:[{x:.18,y:.14,w:60,h:125},{x:.82,y:.14,w:60,h:125},{x:.18,y:.5,w:60,h:125},{x:.82,y:.5,w:60,h:125}], tL:50 },
+    { c:{x:.5,y:.9,a:0},  t:{x:.25,y:.22,w:92,h:130,a:Math.PI/7}, o:[{x:.75,y:.22,w:65,h:110},{x:.75,y:.55,w:65,h:110},{x:.25,y:.55,w:65,h:110},{x:.5,y:.82,w:210,h:28}], tL:55 },
+    { c:{x:.5,y:.93,a:0}, t:{x:.72,y:.13,w:88,h:128,a:0}, o:[{x:.28,y:.13,w:55,h:118},{x:.72,y:.46,w:55,h:118},{x:.28,y:.46,w:55,h:118},{x:.5,y:.72,w:185,h:26},{x:.5,y:.33,w:26,h:195}], tL:65 },
+    { c:{x:.5,y:.9,a:Math.PI}, t:{x:.7,y:.12,w:86,h:124,a:Math.PI/6}, o:[{x:.3,y:.12,w:52,h:114},{x:.7,y:.45,w:52,h:114},{x:.3,y:.45,w:52,h:114},{x:.5,y:.72,w:175,h:26},{x:.5,y:.3,w:26,h:180},{x:.15,y:.5,w:28,h:220}], tL:65 },
+    { c:{x:.5,y:.92,a:0}, t:{x:.5,y:.1,w:80,h:120,a:0}, o:[{x:.22,y:.1,w:50,h:108},{x:.78,y:.1,w:50,h:108},{x:.22,y:.44,w:50,h:108},{x:.78,y:.44,w:50,h:108},{x:.5,y:.7,w:165,h:24},{x:.5,y:.32,w:24,h:190},{x:.15,y:.27,w:120,h:22},{x:.15,y:.7,w:120,h:22}], tL:70 },
+    { c:{x:.25,y:.9,a:0}, t:{x:.78,y:.1,w:82,h:122,a:0}, o:[{x:.25,y:.1,w:52,h:112},{x:.78,y:.42,w:52,h:112},{x:.25,y:.42,w:52,h:112},{x:.5,y:.68,w:200,h:24},{x:.5,y:.3,w:24,h:200},{x:.78,y:.72,w:52,h:112}], tL:75 },
+    { c:{x:.5,y:.92,a:Math.PI/2}, t:{x:.14,y:.14,w:78,h:118,a:Math.PI/4}, o:[{x:.5,y:.14,w:55,h:105},{x:.5,y:.45,w:55,h:105},{x:.14,y:.45,w:55,h:105},{x:.76,y:.3,w:55,h:105},{x:.76,y:.7,w:55,h:105},{x:.35,y:.7,w:160,h:24}], tL:80 },
+    { c:{x:.5,y:.9,a:0}, t:{x:.15,y:.5,w:75,h:115,a:0}, o:[{x:.5,y:.5,w:28,h:240},{x:.15,y:.18,w:28,h:140},{x:.15,y:.82,w:28,h:140},{x:.72,y:.5,w:50,h:100}], tL:85 },
+    { c:{x:.75,y:.9,a:Math.PI}, t:{x:.25,y:.1,w:74,h:112,a:0}, o:[{x:.25,y:.1,w:48,h:105},{x:.75,y:.1,w:48,h:105},{x:.25,y:.4,w:48,h:105},{x:.75,y:.4,w:48,h:105},{x:.5,y:.68,w:180,h:22},{x:.5,y:.28,w:22,h:200},{x:.15,y:.55,w:28,h:200},{x:.85,y:.55,w:28,h:200}], tL:90 },
+    { c:{x:.5,y:.94,a:0}, t:{x:.5,y:.08,w:70,h:108,a:0}, o:[{x:.2,y:.08,w:46,h:100},{x:.8,y:.08,w:46,h:100},{x:.2,y:.38,w:46,h:100},{x:.8,y:.38,w:46,h:100},{x:.5,y:.65,w:155,h:22},{x:.5,y:.28,w:22,h:185},{x:.15,y:.5,w:22,h:190},{x:.85,y:.5,w:22,h:190},{x:.35,y:.82,w:130,h:22},{x:.65,y:.82,w:130,h:22}], tL:100 },
   ];
 
-  let car, lives, score, timer, levelData, levelIdx, levelComplete, gameOver;
+  let car, Lv, Sco, Tmr, LD, done=false, ov=false;
 
   function init(idx) {
-    levelIdx = Math.min(idx, MAX_LEVEL);
-    levelData = levels[levelIdx-1];
-    car = { x: levelData.car.x*BASE_W, y: levelData.car.y*BASE_H, angle: levelData.car.angle, speed: 0 };
-    lives=3; score=0; timer=0; levelComplete=false; gameOver=false;
-    document.getElementById('park-level').textContent = `Level ${levelIdx}`;
-    updateHUD();
+    Lv = Math.min(idx, ML);
+    LD = Lvs[Lv-1];
+    car = { x: LD.c.x*BW, y: LD.c.y*BH, a: LD.c.a, s: 0 };
+    Sco = 0; Tmr = 0; done = false; ov = false;
+    $('plevel').textContent = `Level ${Lv}`;
+    phud();
   }
 
-  function update(dt) {
-    if (gameOver || levelComplete) return;
-    timer += dt;
+  function u(dt) {
+    if (ov || done) return;
+    Tmr += dt;
 
-    const accel = isUp() ? 1 : isDown() ? -1 : 0;
-    const steer = isRight() ? 1 : isLeft() ? -1 : 0;
+    const ac = U() ? 1 : Dn() ? -1 : 0;
+    const st = R() ? 1 : L() ? -1 : 0;
 
-    car.speed += accel * ACCELERATION;
-    car.speed *= FRICTION;
-    car.speed = Math.max(-MAX_SPEED*0.5, Math.min(MAX_SPEED, car.speed));
-    car.speed = Math.abs(car.speed) < 0.05 ? 0 : car.speed;
+    car.s += ac * ACCEL;
+    car.s *= FRIC;
+    car.s = Math.max(-MAXSP*0.5, Math.min(MAXSP, car.s));
+    car.s = Math.abs(car.s) < 0.05 ? 0 : car.s;
 
-    if (Math.abs(car.speed) > 0.5) {
-      const dir = car.speed > 0 ? 1 : -1;
-      car.angle += steer * TURN_SPEED * dir * dt * (Math.abs(car.speed) / MAX_SPEED);
+    if (Math.abs(car.s) > 0.5) {
+      const dir = car.s > 0 ? 1 : -1;
+      car.a += st * TURN * dir * dt * (Math.abs(car.s) / MAXSP);
     }
-    car.x += Math.cos(car.angle) * car.speed;
-    car.y += Math.sin(car.angle) * car.speed;
+    car.x += Math.cos(car.a) * car.s;
+    car.y += Math.sin(car.a) * car.s;
 
-    if (checkCollisions()) {
-      lives--; car.speed = -car.speed*0.3;
-      car.x -= Math.cos(car.angle)*4; car.y -= Math.sin(car.angle)*4;
-      playCrash();
-      if (lives<=0) { gameOver=true; triggerGameOver(); }
-      updateHUD(); return;
-    }
-
-    const t = levelData.target;
-    const dist = Math.hypot(car.x-t.x*BASE_W, car.y-t.y*BASE_H);
-    const angleDiff = ((car.angle - t.angle) % (Math.PI*2) + Math.PI*2) % (Math.PI*2);
-    const angleOk = Math.abs(angleDiff - Math.PI) < 0.3 || angleDiff < 0.3;
-    if (dist < Math.min(t.w,t.h)*0.38 && angleOk && Math.abs(car.speed) < 0.6) {
-      levelComplete=true;
-      const base = Math.max(0, 1000 - Math.floor(timer)*10);
-      const prec = Math.floor(Math.max(0,(1 - timer/levelData.timeLimit))*300);
-      score += base + prec;
-      playParkingSuccess();
-      triggerLevelComplete();
+    if (hit()) {
+      Lv--; car.s = -car.s * 0.3;
+      car.x -= Math.cos(car.a)*4; car.y -= Math.sin(car.a)*4;
+      sCras();
+      if (Lv <= 0) { ov = true; og(); }
+      phud(); return;
     }
 
-    const remaining = Math.max(0, levelData.timeLimit-timer);
-    const pct = remaining / levelData.timeLimit;
-    const fill = document.getElementById('timer-fill');
-    fill.style.width = (pct*100)+'%';
-    fill.style.background = pct>0.5?'#2ecc71':pct>0.25?'#f39c12':'#e74c3c';
-    document.getElementById('timer-label').textContent = Math.ceil(remaining)+'s';
-    updateHUD();
+    const t = LD.t;
+    const dist = Math.hypot(car.x - t.x*BW, car.y - t.y*BH);
+    const ad = ((car.a - t.a) % (Math.PI*2) + Math.PI*2) % (Math.PI*2);
+    const ok = Math.abs(ad - Math.PI) < 0.3 || ad < 0.3;
+    if (dist < Math.min(t.w,t.h)*0.37 && ok && Math.abs(car.s) < 0.6) {
+      done = true;
+      Sco += Math.max(0, 1000 - Math.floor(Tmr)*10) + Math.floor(Math.max(0,(1-Tmr/LD.tL))*300);
+      sSucc(); win();
+    }
+
+    const rem = Math.max(0, LD.tL - Tmr);
+    const pct = rem / LD.tL;
+    const fi = $('tfi');
+    fi.style.width = (pct*100)+'%';
+    fi.style.background = pct>0.5?'#2ecc71':pct>0.25?'#f39c12':'#e74c3c';
+    $('tlbl').textContent = Math.ceil(rem) + 's';
+    phud();
   }
 
-  function rotatedRect(cx, cy, cw, ch, angle) {
-    const pts=[{x:-cw/2,y:-ch/2},{x:cw/2,y:-ch/2},{x:cw/2,y:ch/2},{x:-cw/2,y:ch/2}];
-    const cos=Math.cos(angle), sin=Math.sin(angle);
-    return pts.map(p=>({x:cx+p.x*cos-p.y*sin, y:cy+p.x*sin+p.y*cos}));
+  function rr(px,py,w,h,ang) {
+    const pts=[{x:-w/2,y:-h/2},{x:w/2,y:-h/2},{x:w/2,y:h/2},{x:-w/2,y:h/2}];
+    const co=Math.cos(ang),si=Math.sin(ang);
+    return pts.map(p=>({x:px+p.x*co-p.y*si, y:py+p.x*si+p.y*co}));
   }
-  function prOverlap(a,b) {
-    function project(pts,axis) { const ps=pts.map(p=>p.x*axis.x+p.y*axis.y); return {min:Math.min(...ps),max:Math.max(...ps)}; }
-    function axisVec(a,b) { const len=Math.hypot(b.x-a.x,b.y-a.y); return len===0?{x:0,y:0}:{x:(b.x-a.x)/len,y:(b.y-a.y)/len}; }
-    const axes=[axisVec(a[0],a[1]),axisVec(a[1],a[2]),axisVec(b[0],b[1]),axisVec(b[1],b[2])];
-    for(const ax of axes) { const p1=project(a,ax),p2=project(b,ax); if(p1.max<p2.min||p2.max<p1.min) return false; }
+  function sat(a,b) {
+    function proj(pts,ax) { const ps=pts.map(p=>p.x*ax.x+p.y*ax.y); return {mn:Math.min(...ps),mx:Math.max(...ps)}; }
+    function edg(a,b) { return { x: b.x-a.x, y: b.y-a.y }; }
+    function normal(a,b) { const e=edg(a,b); const l=Math.hypot(e.x,e.y); return l===0?{x:0,y:0}:{x:-e.y/l,y:e.x/l}; }
+    const axes=[normal(a[0],a[1]),normal(a[1],a[2]),normal(b[0],b[1]),normal(b[1],b[2])];
+    for(const ax of axes) { const p1=proj(a,ax),p2=proj(b,ax); if(p1.mx<p2.mn||p2.mx<p1.mn) return false; }
     return true;
   }
 
-  function checkCollisions() {
-    const pcar = rotatedRect(car.x, car.y, CAR_W*0.8, CAR_H*0.8, car.angle);
-    if (car.x<CAR_W/2||car.x>BASE_W-CAR_W/2||car.y<CAR_H/2||car.y>BASE_H-CAR_H/2) return true;
-    for (const obs of levelData.obstacles) {
-      const ox=obs.x*BASE_W-obs.w/2, oy=obs.y*BASE_H-obs.h/2;
-      const pob=[{x:ox,y:oy},{x:ox+obs.w,y:oy},{x:ox+obs.w,y:oy+obs.h},{x:ox,y:oy+obs.h}];
-      if (prOverlap(pcar,pob)) return true;
+  function hit() {
+    const pcar = rr(car.x, car.y, CW*0.8, CH*0.8, car.a);
+    if (car.x<CW/2||car.x>BW-CW/2||car.y<CH/2||car.y>BH-CH/2) return true;
+    for (const ob of LD.o) {
+      const ox=ob.x*BW-ob.w/2, oy=ob.y*BH-ob.h/2;
+      const pob=[{x:ox,y:oy},{x:ox+ob.w,y:oy},{x:ox+ob.w,y:oy+ob.h},{x:ox,y:oy+ob.h}];
+      if (sat(pcar,pob)) return true;
     }
     return false;
   }
 
-  function render() {
-    ctx.fillStyle='#1a1a2e'; ctx.fillRect(0,0,BASE_W,BASE_H);
-    ctx.strokeStyle='#2a2a3e'; ctx.lineWidth=1;
-    for(let x=80;x<BASE_W;x+=80){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,BASE_H);ctx.stroke();}
-    for(let y=80;y<BASE_H;y+=80){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(BASE_W,y);ctx.stroke();}
-    if (!levelData) return;
+  function r() {
+    cx.fillStyle='#1a1a2e'; cx.fillRect(0,0,BW,BH);
+    cx.strokeStyle='#2a2a3e'; cx.lineWidth=1;
+    for(let x=80;x<BW;x+=80){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,BH);cx.stroke();}
+    for(let y=80;y<BH;y+=80){cx.beginPath();cx.moveTo(0,y);cx.lineTo(BW,y);cx.stroke();}
+    if (!LD) return;
 
-    levelData.obstacles.forEach(obs => {
-      const ox=obs.x*BASE_W-obs.w/2, oy=obs.y*BASE_H-obs.h/2;
-      ctx.fillStyle='#922b21'; ctx.fillRect(ox,oy,obs.w,obs.h);
-      ctx.save(); ctx.beginPath(); ctx.rect(ox,oy,obs.w,obs.h); ctx.clip();
-      ctx.strokeStyle='#c0392b'; ctx.lineWidth=2;
-      for(let i=-obs.h;i<obs.w+obs.h;i+=12){ctx.beginPath();ctx.moveTo(ox+i,oy);ctx.lineTo(ox+i+obs.h,oy+obs.h);ctx.stroke();}
-      ctx.restore();
+    LD.o.forEach(ob => {
+      const ox=ob.x*BW-ob.w/2, oy=ob.y*BH-ob.h/2;
+      cx.fillStyle='#922b21'; cx.fillRect(ox,oy,ob.w,ob.h);
+      cx.save(); cx.beginPath(); cx.rect(ox,oy,ob.w,ob.h); cx.clip();
+      cx.strokeStyle='#c0392b'; cx.lineWidth=2;
+      for(let i=-ob.h;i<ob.w+ob.h;i+=12){cx.beginPath();cx.moveTo(ox+i,oy);cx.lineTo(ox+i+ob.h,oy+ob.h);cx.stroke();}
+      cx.restore();
     });
 
-    const t = levelData.target;
-    ctx.save();
-    ctx.translate(t.x*BASE_W, t.y*BASE_H); ctx.rotate(t.angle);
-    ctx.strokeStyle='#2ecc71'; ctx.lineWidth=3; ctx.setLineDash([8,6]);
-    ctx.strokeRect(-t.w/2,-t.h/2,t.w,t.h);
-    ctx.setLineDash([]);
-    ctx.fillStyle='rgba(46,204,113,0.12)'; ctx.fillRect(-t.w/2,-t.h/2,t.w,t.h);
-    ctx.fillStyle='#2ecc71'; ctx.font='bold 36px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('P',0,0);
-    ctx.restore();
+    const t = LD.t;
+    cx.save();
+    cx.translate(t.x*BW, t.y*BH); cx.rotate(t.a);
+    cx.strokeStyle='#2ecc71'; cx.lineWidth=3; cx.setLineDash([8,6]);
+    cx.strokeRect(-t.w/2,-t.h/2,t.w,t.h);
+    cx.setLineDash([]);
+    cx.fillStyle='rgba(46,204,113,0.11)'; cx.fillRect(-t.w/2,-t.h/2,t.w,t.h);
+    cx.fillStyle='#2ecc71'; cx.font='bold 34px sans-serif'; cx.textAlign='center'; cx.textBaseline='middle';
+    cx.fillText('P',0,0);
+    cx.restore();
 
-    // Player car — tall rectangle (top-down view)
-    ctx.save(); ctx.translate(car.x,car.y); ctx.rotate(car.angle);
-    ctx.fillStyle='#9b59b6';
-    ctx.beginPath(); ctx.roundRect(-CAR_W/2,-CAR_H/2,CAR_W,CAR_H,5); ctx.fill();
-    ctx.fillStyle='rgba(26,26,46,0.7)'; ctx.fillRect(-CAR_W*0.3,-CAR_H*0.15,CAR_W*0.6,CAR_H*0.28);
-    ctx.fillStyle='#fff'; ctx.fillRect(-CAR_W*0.33,-CAR_H/2+4,CAR_W*0.2,5); ctx.fillRect(CAR_W*0.13,-CAR_H/2+4,CAR_W*0.2,5);
-    ctx.fillStyle='#ff3333'; ctx.fillRect(-CAR_W*0.33,CAR_H/2-9,CAR_W*0.2,5); ctx.fillRect(CAR_W*0.13,CAR_H/2-9,CAR_W*0.2,5);
-    ctx.restore();
+    // Player car — tall rectangle (top-down)
+    cx.save(); cx.translate(car.x,car.y); cx.rotate(car.a);
+    cx.fillStyle='#9b59b6';
+    cx.beginPath(); cx.roundRect(-CW/2,-CH/2,CW,CH,5); cx.fill();
+    cx.fillStyle='rgba(26,26,46,0.7)'; cx.fillRect(-CW*0.3,-CH*0.15,CW*0.6,CH*0.28);
+    cx.fillStyle='#fff'; cx.fillRect(-CW*0.33,-CH/2+4,CW*0.2,4); cx.fillRect(CW*0.13,-CH/2+4,CW*0.2,4);
+    cx.fillStyle='#ff3333'; cx.fillRect(-CW*0.33,CH/2-8,CW*0.2,4); cx.fillRect(CW*0.13,CH/2-8,CW*0.2,4);
+    cx.restore();
   }
 
-  function updateHUD() {
-    document.getElementById('park-lives').textContent='❤️'.repeat(Math.max(0,lives));
-    document.getElementById('park-score').textContent=Math.floor(score);
-  }
+  function phud() { $('plives').textContent='❤️'.repeat(Math.max(0,Lv)); $('pscore').textContent=Math.floor(Sco); }
 
-  function triggerGameOver() {
-    currentState=State.GAME_OVER; stopGameLoop();
-    document.getElementById('go-title').textContent='GAME OVER';
-    document.getElementById('go-score').textContent='Score: '+Math.floor(score);
-    showOverlay('overlay-gameover');
-  }
+  function og() { state = ST.OVER; stop(); $('ovtit').textContent='GAME OVER'; $('ovsco').textContent=`Score: ${Math.floor(Sco)}`; showOvid('ovover'); }
 
-  function triggerLevelComplete() {
-    currentState=State.LEVEL_COMPLETE; stopGameLoop();
-    document.getElementById('lc-score').textContent='Score: '+Math.floor(score);
-    const nextBtn = document.getElementById('lc-next-btn');
-    if (levelIdx >= MAX_LEVEL) { nextBtn.textContent='🏆 All Done!'; nextBtn.onclick=exitToHome; }
-    else { nextBtn.textContent='▶ Level '+(levelIdx+1); nextBtn.onclick=nextLevel; }
-    showOverlay('overlay-levelcomplete');
-  }
+  function win() { state = ST.WIN; stop(); $('winsco').textContent=`Score: ${Math.floor(Sco)}`; const nb=$('nxtbtn'); if(lvl>=ML){nb.textContent='🏆 All Done!'; nb.onclick=exith;} else {nb.textContent=`▶ Level ${lvl+1}`; nb.onclick=nxLvl;} showOvid('ovwin'); }
 
-  return { init, update, render };
+  return { init, u, r };
 })();
 
-// ===== POLYFILL =====
+// ── roundRect polyfill ──────────────────────────────────
 if (!CanvasRenderingContext2D.prototype.roundRect) {
-  CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){
-    if(w<2*r)r=w/2;if(h<2*r)r=h/2;
+  CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r) {
+    if (w<2*r)r=w/2;if(h<2*r)r=h/2;
     this.moveTo(x+r,y);this.arcTo(x+w,y,x+w,y+h,r);this.arcTo(x+w,y+h,x,y+h,r);
     this.arcTo(x,y+h,x,y,r);this.arcTo(x,y,x+w,y,r);this.closePath();
   };
 }
 
-// ===== INIT =====
-document.addEventListener('click',   ()=>getAudio(), {once:true});
-document.addEventListener('touchstart', ()=>getAudio(), {once:true});
-setupDpad();
-startGamepad();
+// ── Boot ────────────────────────────────────────────────
+document.addEventListener('click',   ()=>acx(), {once:true});
+document.addEventListener('touchstart', ()=>acx(), {once:true});
+startGP();
 </script>
 </body>
 </html>
