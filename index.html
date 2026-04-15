@@ -598,6 +598,7 @@ function launch(type,level=1){
 
 // ── Countdown ─────────────────────────────────────────────
 function cdwn(n){
+  if(state===ST.START||state===ST.PLAY)return; // guard: no double countdown
   state=ST.START; showOvid('ovstart');
   $('stit').textContent=game==='race'?'GET READY!':`LEVEL ${lvl}`;
   let c=n; $('scnt').textContent=c; sStrt();
@@ -750,7 +751,7 @@ const Race=(()=>{
     if(Lft()&&CL>0){CL--;K['ArrowLeft']=false;K['KeyA']=false;}
     if(Rg()&&CL<Lanes-1){CL++;K['ArrowRight']=false;K['KeyD']=false;}
 
-    const esp=Spd+dL*45;
+    const esp=Spd+dL*50;
     const sp=shldA?esp*0.8:esp; // shield = slower (less exposure)
 
     // Spawn
@@ -875,7 +876,7 @@ const Race=(()=>{
     Pt.forEach(p=>{cx.globalAlpha=p.l;cx.fillStyle=p.col;cx.beginPath();cx.arc(p.x,p.y,4*p.l,0,Math.PI*2);cx.fill();});
     cx.globalAlpha=1;
 
-    if(dL>0){cx.fillStyle='rgba(255,215,0,0.78)';cx.font='bold 12px Orbitron,sans-serif';cx.textAlign='left';cx.fillText(`SPD +${dL*45}`,16,BH-14);}
+    if(dL>0){cx.fillStyle='rgba(255,215,0,0.78)';cx.font='bold 12px Orbitron,sans-serif';cx.textAlign='left';cx.fillText(`SPD +${dL*50}`,16,BH-14);}
 
     if(Grc>0){
       cx.fillStyle='rgba(0,0,0,0.43)';cx.fillRect(0,0,BW,BH);
@@ -931,7 +932,7 @@ const Race=(()=>{
     const top=hsCheck('race_hs',Sco);
     $('ovtit').textContent='RACE OVER';
     $('ovsco').textContent=`SCORE: ${Math.floor(Sco)}`;
-    $('ovtime').textContent=`TIME: ${fmtTime(totalT)}  |  SPD +${dL*45}`;
+    $('ovtime').textContent=`TIME: ${fmtTime(totalT)}  |  SPD +${dL*50}`;
     $('ovhs').textContent=fmtHS(top);
     showOvid('ovover');
   }
