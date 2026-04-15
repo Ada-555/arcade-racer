@@ -87,9 +87,13 @@
     .gbtn:hover { background: rgba(233,69,96,0.7); }
 
     /* Shield activate button — big centered button on mobile */
-    #shld-btn { display: none; position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%); z-index: 9; background: rgba(79,195,247,0.2); border: 2px solid #4fc3f7; color: #4fc3f7; font-family: 'Press Start 2P', monospace; font-size: clamp(0.45rem, 1.5vw, 0.6rem); padding: 8px 18px; border-radius: 4px; cursor: pointer; animation: shieldPulse 1s ease-in-out infinite; }
+    #shld-btn { display: none; }
     @keyframes shieldPulse { 0%,100%{box-shadow: 0 0 8px rgba(79,195,247,0.4)} 50%{box-shadow: 0 0 20px rgba(79,195,247,0.8)} }
     #shld-btn:active { background: rgba(79,195,247,0.4); }
+    #shield-emoji { font-size: clamp(12px, 2vw, 18px); }
+    #shield-emoji.ready { animation: shieldEmojiPulse 0.9s ease-in-out infinite; }
+    #shield-emoji.active { filter: drop-shadow(0 0 6px #4fc3f7) drop-shadow(0 0 12px #4fc3f7); }
+    @keyframes shieldEmojiPulse { 0%,100%{transform:scale(1);opacity:0.7} 50%{transform:scale(1.3);opacity:1} }
 
     /* Mute btn */
     #mute-btn { display: none; position: absolute; top: 8px; left: 8px; z-index: 6; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.18); color: #fff; width: 34px; height: 34px; border-radius: 50%; font-size: 15px; cursor: pointer; }
@@ -170,6 +174,7 @@
     <!-- Race HUD -->
     <div class="hud" id="race-hud" style="display:none">
       <span class="hl" id="hlives">❤️❤️❤️</span>
+      <span id="shield-emoji" style="display:none"></span>
       <span id="race-time">0:00</span>
       <div id="shield-wrap">
         <span id="shld-lbl">SHIELD</span>
@@ -190,8 +195,6 @@
       <div id="tbr"><div id="tfi" style="width:100%;background:#2ecc71"></div></div>
       <div id="tlbl">60s</div>
     </div>
-
-    <button id="shld-btn" onclick="activateShield()">🛡️ ACTIVATE SHIELD</button>
 
     <div id="gbtns">
       <button class="gbtn" id="gpause" title="Pause">⏸</button>
@@ -499,7 +502,7 @@ function launch(type,level=1){
 
   if(type==='race'){
     $('bup').classList.add('gone');
-    $('bdown').classList.remove('gone');
+    $('bdown').classList.add('gone');
     $('race-hud').style.display='flex';
     $('park-hud').style.display='none';
     $('tbw').style.display='none';
@@ -570,8 +573,8 @@ function loop(ts){
 // ── Controls ─────────────────────────────────────────────
 function pauseG(){if(state!==ST.PLAY)return;state=ST.PAUS;stop();M.stop();sPaus();$('ptit').textContent=game==='race'?'RACE PAUSED':'PARKING PAUSED';showOvid('ovpause');}
 function resm(){if(state!==ST.PAUS)return;state=ST.PLAY;showOvid(null);M.start(game);gl();}
-function rest(){showOvid(null);M.stop();if(game==='race'){Race.init();cdwn(3);}else{Parking.init(lvl);cdwn(2);}}
-function exith(){stop();M.stop();state=ST.MENU;game=null;showOvid(null);$('gbtns').style.display='none';$('mute-btn').style.display='none';nav('home');}
+function rest(){showOvid(null);M.stop();if(game==='race'){Race.init();cdwn(3);}else{Parking.init(lvl);cdwn(2);}M.start(game);}
+function exith(){stop();M.stop();state=ST.MENU;game=null;showOvid(null);$('gbtns').style.display='none';nav('home');}
 function nxLvl(){showOvid(null);lvl++;if(lvl>10){exith();return;}Parking.init(lvl);M.start('park');cdwn(2);}
 function fmtTime(s){const m=Math.floor(s/60);const sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec;}
 
@@ -621,7 +624,8 @@ const Race=(()=>{
     shld=SHIELD_MAX; shldA=false; shldT=0; shldReady=false;
     $('shld-fill').style.width='100%';
     $('shld-ready').style.display='none';
-    $('shld-btn').style.display='none';
+    $('shield-emoji').style.display='none';
+    $('shield-emoji').classList.remove('ready','active');
     hud();
   }
 
@@ -629,9 +633,9 @@ const Race=(()=>{
     if(!shldReady||shldA)return;
     shldA=true; shldT=5; shldReady=false;
     shld=0;
-    $('shld-btn').style.display='none';
     $('shld-ready').style.display='none';
     $('shld-fill').style.width='0%';
+    $('shield-emoji').style.display='none';
     sShield();
   }
 
@@ -650,15 +654,24 @@ const Race=(()=>{
       shldT-=dt;
       if(shldT<=0){shldA=false;sShieldEnd();}
     } else {
-      shld=Math.min(SHIELD_MAX, shld+(dt*(SHIELD_MAX/12)));
+      shld=Math.min(SHIELD_MAX, shld+(dt*(SHIELD_MAX/18)));
       if(shld>=SHIELD_MAX&&!shldReady){shldReady=true;sShield();}
     }
     $('shld-fill').style.width=(shld/SHIELD_MAX*100)+'%';
     if(shldReady&&!shldA){
       $('shld-ready').style.display='inline';
-      $('shld-btn').style.display='block';
+      $('shield-emoji').style.display='inline';
+      $('shield-emoji').textContent='🛡';
+      $('shield-emoji').classList.add('ready');
+      $('shield-emoji').classList.remove('active');
+    } else if(shldA){
+      $('shield-emoji').style.display='inline';
+      $('shield-emoji').textContent='🛡';
+      $('shield-emoji').classList.add('active');
+      $('shield-emoji').classList.remove('ready');
     } else {
       $('shld-ready').style.display='none';
+      $('shield-emoji').style.display='none';
     }
 
     // Lane change only (left/right)
@@ -811,12 +824,12 @@ const Race=(()=>{
     cx.fillStyle='rgba(26,26,46,0.72)';cx.fillRect(L+w*0.24,top+h*0.18,w*0.52,h*0.16);
     cx.fillStyle='rgba(26,26,46,0.55)';cx.fillRect(L+w*0.24,top+h*0.42,w*0.52,h*0.13);
     cx.fillStyle='#111'; // all wheels black
-    cx.beginPath();cx.ellipse(L+wox,top+woy,wr*0.85,wr,0,0,Math.PI*2);cx.fill();
-    cx.beginPath();cx.ellipse(R-wox,top+woy,wr*0.85,wr,0,0,Math.PI*2);cx.fill();
-    cx.beginPath();cx.ellipse(L+wox,bot-woy,wr*0.85,wr,0,0,Math.PI*2);cx.fill();
-    cx.beginPath();cx.ellipse(R-wox,bot-woy,wr*0.85,wr,0,0,Math.PI*2);cx.fill();
+    cx.beginPath();cx.ellipse(L+wox,top+woy,h*0.42,wr,0,0,Math.PI*2);cx.fill();
+    cx.beginPath();cx.ellipse(R-wox,top+woy,h*0.42,wr,0,0,Math.PI*2);cx.fill();
+    cx.beginPath();cx.ellipse(L+wox,bot-woy,h*0.42,wr,0,0,Math.PI*2);cx.fill();
+    cx.beginPath();cx.ellipse(R-wox,bot-woy,h*0.42,wr,0,0,Math.PI*2);cx.fill();
     cx.fillStyle='#333'; // rims
-    const rimR=wr*0.5;
+    const rimR=h*0.20;
     cx.beginPath();cx.ellipse(L+wox,top+woy,rimR,rimR,0,0,Math.PI*2);cx.fill();
     cx.beginPath();cx.ellipse(R-wox,top+woy,rimR,rimR,0,0,Math.PI*2);cx.fill();
     cx.beginPath();cx.ellipse(L+wox,bot-woy,rimR,rimR,0,0,Math.PI*2);cx.fill();
@@ -877,7 +890,7 @@ const Parking=(()=>{
 
   function init(idx){
     Lv=Math.min(idx,ML);LD=Lvs[Lv-1];
-    car={x:LD.c.x*BW,y:LD.c.y*BH,a:LD.c.a,s:0};
+    car={x:LD.c.x*BW,y:LD.c.y*BH,a:-Math.PI/2,s:0};
     Sco=0;Tmr=0;done=false;ov=false;
     $('plevel').textContent=`LEVEL ${Lv}`;phud();
   }
