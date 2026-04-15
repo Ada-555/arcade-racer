@@ -301,6 +301,18 @@ let M = (() => {
 
 
 // ── Audio SFX ─────────────────────────────────────────
+let ac=null;
+function acx(){if(!ac)ac=new(AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();return ac;}
+function tn(f,t='sine',d=0.2,v=0.3,dl=0){try{const c=acx(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type=t;o.frequency.setValueAtTime(f,c.currentTime+dl);g.gain.setValueAtTime(v,c.currentTime+dl);g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+dl+d);o.start(c.currentTime+dl);o.stop(c.currentTime+dl+d);}catch(e){}}
+function ns(d=0.2,v=0.4){try{const c=acx(),b=c.createBuffer(1,c.sampleRate*d,c.sampleRate),dat=b.getChannelData(0);for(let i=0;i<dat.length;i++)dat[i]=(Math.random()*2-1)*Math.exp(-i/(c.sampleRate*0.04));const s=c.createBufferSource(),g=c.createGain();s.buffer=b;s.connect(g);g.connect(c.destination);g.gain.setValueAtTime(v,c.currentTime);s.start();}catch(e){}}
+const sCol=()=>{tn(523);tn(659,'sine',0.1,0.25,0.08);tn(784,'sine',0.15,0.2,0.16);};
+const sCras=()=>{tn(80,'sawtooth',0.35,0.5);ns(0.25,0.45);};
+const sStrt=()=>[261,329,392,523].forEach((f,i)=>tn(f,'sine',0.18,0.3,i*0.12));
+const sPaus=()=>tn(440,'sine',0.2,0.25);
+const sSucc=()=>[523,659,784,1047].forEach((f,i)=>tn(f,'sine',0.22,0.3,i*0.13));
+const sDiff=()=>[440,550,660,880].forEach((f,i)=>tn(f,'sine',0.12,0.22,i*0.08));
+const sShield=()=>{tn(880,'sine',0.15,0.3);tn(1100,'sine',0.2,0.25,0.1);};
+const sShieldEnd=()=>{tn(300,'sine',0.4,0.3);};
 document.addEventListener('keyup',e=>{K[e.code]=false;});
 
 function pollGP(){
