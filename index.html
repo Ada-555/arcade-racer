@@ -662,6 +662,7 @@ const Race=(()=>{
       shld=Math.min(SHIELD_MAX, shld+(dt*(SHIELD_MAX/18)));
       if(shld>=SHIELD_MAX&&!shldReady){shldReady=true;sShield();}
     }
+    if(Act()&&shldReady&&!shldA){activateShield();}
     $('shld-fill').style.width=(shld/SHIELD_MAX*100)+'%';
     if(shldReady&&!shldA){
       $('shld-ready').style.display='inline';
@@ -893,8 +894,8 @@ const Parking=(()=>{
     {c:{x:.25,y:.9,a:0},t:{x:.78,y:.1,w:82,h:122,a:0},o:[{x:.25,y:.1,w:52,h:112},{x:.78,y:.42,w:52,h:112},{x:.25,y:.42,w:52,h:112},{x:.5,y:.68,w:200,h:24},{x:.5,y:.3,w:24,h:200},{x:.78,y:.72,w:52,h:112}],tL:75},
     {c:{x:.5,y:.92,a:Math.PI/2},t:{x:.14,y:.14,w:78,h:118,a:Math.PI/4},o:[{x:.5,y:.14,w:55,h:105},{x:.5,y:.45,w:55,h:105},{x:.14,y:.45,w:55,h:105},{x:.76,y:.3,w:55,h:105},{x:.76,y:.7,w:55,h:105},{x:.35,y:.7,w:160,h:24}],tL:80},
     {c:{x:.5,y:.9,a:0},t:{x:.15,y:.5,w:75,h:115,a:0},o:[{x:.5,y:.5,w:28,h:240},{x:.15,y:.18,w:28,h:140},{x:.15,y:.82,w:28,h:140},{x:.72,y:.5,w:50,h:100}],tL:85},
-    {c:{x:.75,y:.9,a:Math.PI},t:{x:.25,y:.1,w:74,h:112,a:0},o:[{x:.25,y:.1,w:48,h:105},{x:.75,y:.1,w:48,h:105},{x:.25,y:.4,w:48,h:105},{x:.75,y:.4,w:48,h:105},{x:.5,y:.68,w:180,h:22},{x:.5,y:.28,w:22,h:200},{x:.15,y:.55,w:28,h:200},{x:.85,y:.55,w:28,h:200}],tL:90},
-    {c:{x:.5,y:.94,a:0},t:{x:.5,y:.08,w:70,h:108,a:0},o:[{x:.2,y:.08,w:46,h:100},{x:.8,y:.08,w:46,h:100},{x:.2,y:.38,w:46,h:100},{x:.8,y:.38,w:46,h:100},{x:.5,y:.65,w:155,h:22},{x:.5,y:.28,w:22,h:185},{x:.15,y:.5,w:22,h:190},{x:.85,y:.5,w:22,h:190},{x:.35,y:.82,w:130,h:22},{x:.65,y:.82,w:130,h:22}],tL:100},
+    {c:{x:.75,y:.9,a:Math.PI},t:{x:.25,y:.1,w:74,h:112,a:0},o:[{x:.25,y:.1,w:48,h:105},{x:.75,y:.1,w:48,h:105},{x:.25,y:.4,w:48,h:105},{x:.75,y:.4,w:48,h:105},{x:.5,y:.68,w:180,h:22},{x:.5,y:.2,w:22,h:180},{x:.15,y:.55,w:28,h:200},{x:.85,y:.55,w:28,h:200}],tL:90},
+    {c:{x:.5,y:.94,a:0},t:{x:.5,y:.08,w:70,h:108,a:0},o:[{x:.2,y:.08,w:46,h:100},{x:.8,y:.08,w:46,h:100},{x:.2,y:.38,w:46,h:100},{x:.8,y:.38,w:46,h:100},{x:.5,y:.65,w:155,h:22},{x:.5,y:.2,w:22,h:165},{x:.15,y:.5,w:22,h:190},{x:.85,y:.5,w:22,h:190},{x:.35,y:.82,w:130,h:22},{x:.65,y:.82,w:130,h:22}],tL:100},
   ];
 
   let car,Lv,Sco,Tmr,LD,done=false,ov=false;
@@ -919,8 +920,8 @@ const Parking=(()=>{
     if(hit()){Lv--;car.s=-car.s*0.3;car.x-=Math.cos(car.a)*4;car.y-=Math.sin(car.a)*4;sCras();shakeDur=0.25;if(Lv<=0){ov=true;og();}phud();return;}
     const t=LD.t,dist=Math.hypot(car.x-t.x*BW,car.y-t.y*BH);
     const ad=((car.a-t.a)%(Math.PI*2)+Math.PI*2)%(Math.PI*2);
-    const ok=Math.abs(ad-Math.PI)<0.3||ad<0.3;
-    if(dist<Math.min(t.w,t.h)*0.37&&ok&&Math.abs(car.s)<0.6){done=true;Sco+=Math.max(0,1000-Math.floor(Tmr)*10)+Math.floor(Math.max(0,(1-Tmr/LD.tL))*300);sSucc();win();}
+    const ok=ad<0.45||Math.abs(ad-Math.PI)<0.45;
+    if(dist<Math.max(t.w,t.h)*0.48&&ok&&Math.abs(car.s)<0.7){done=true;Sco+=Math.max(0,1000-Math.floor(Tmr)*10)+Math.floor(Math.max(0,(1-Tmr/LD.tL))*300);sSucc();win();}
     const rem=Math.max(0,LD.tL-Tmr),pct=rem/LD.tL;
     const fi=$('tfi');fi.style.width=(pct*100)+'%';fi.style.background=pct>0.5?'#2ecc71':pct>0.25?'#f39c12':'#e74c3c';
     $('tlbl').textContent=Math.ceil(rem)+'s';phud();
