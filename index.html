@@ -11,6 +11,57 @@
     html, body { width: 100%; height: 100%; overflow: hidden; background: #0a0a12; color: #eee; font-family: 'Press Start 2P', monospace; }
 
     #shome { background: #0a0a12; overflow: hidden; position: relative; }
+
+    /* Animated star particles */
+    #particles { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+    .p { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(255,215,0,0.8), rgba(233,69,96,0.5)); animation: pFloat linear infinite; }
+    @keyframes pFloat {
+      0% { transform: translateY(105vh) scale(0); opacity: 0; }
+      8% { opacity: 0.85; }
+      92% { opacity: 0.6; }
+      100% { transform: translateY(-8vh) scale(0.4); opacity: 0; }
+    }
+    /* Grid pulse */
+    #shome::before { animation: gridScroll 8s linear infinite, gridPulse 4s ease-in-out infinite; }
+    @keyframes gridPulse { 0%,100%{opacity:0.07} 50%{opacity:0.13} }
+    /* Card glow on hover */
+    .gc { transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s; }
+    .gc:hover { transform: translateY(-6px) scale(1.02); border-color: #ffd700; box-shadow: 0 0 30px rgba(255,215,0,0.3), 0 12px 40px rgba(0,0,0,0.65); }
+    .gc:hover .ge { transform: scale(1.1); }
+    .ge { transition: transform 0.2s; display: inline-block; }
+    /* Particle stars */
+    #particles {
+      position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden;
+    }
+    .p { position: absolute; border-radius: 50%; animation: floatP linear infinite; }
+    @keyframes floatP {
+      0% { transform: translateY(100vh) scale(0); opacity: 0; }
+      10% { opacity: 1; transform: translateY(90vh) scale(1); }
+      90% { opacity: 1; }
+      100% { transform: translateY(-10vh) scale(0.5); opacity: 0; }
+    }
+    /* Speed lines */
+    .speedline {
+      position: absolute; height: 1px; background: linear-gradient(90deg, transparent, rgba(233,69,96,0.4), transparent);
+      animation: speedLine linear infinite;
+    }
+    @keyframes speedLine {
+      0% { transform: translateX(-100%); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translateX(100vw); opacity: 0; }
+    }
+    /* Glow pulse on cards */
+    .gc::after {
+      content: ''; position: absolute; inset: -2px; border-radius: 14px;
+      background: linear-gradient(135deg, rgba(233,69,96,0.0), rgba(255,215,0,0.0));
+      animation: cardGlow 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes cardGlow {
+      0%,100% { opacity: 0; }
+      50% { opacity: 1; box-shadow: 0 0 30px rgba(233,69,96,0.3), 0 0 60px rgba(255,215,0,0.15); }
+    }
+
     #shome::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(233,69,96,0.07) 59px, rgba(233,69,96,0.07) 60px), repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(233,69,96,0.07) 59px, rgba(233,69,96,0.07) 60px); animation: gridScroll 8s linear infinite; pointer-events: none; }
     @keyframes gridScroll { from { background-position: 0 0, 0 0; } to { background-position: 0 60px, 0 0; } }
     #shome::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.14) 3px, rgba(0,0,0,0.14) 4px); pointer-events: none; z-index: 20; }
@@ -113,6 +164,16 @@
     .db:active, .db.ps { background: #e94560; }
     .de { visibility: hidden; }
     .db.gone { visibility: hidden; pointer-events: none; }
+    .db.shieldbtn { background: rgba(79,195,247,0.18); border-color: rgba(79,195,247,0.25); color: #4fc3f7; font-size: 18px; width: 58px !important; height: 58px !important; min-width: 58px; min-height: 58px; flex-shrink: 0; box-sizing: border-box; }
+    .db.shieldbtn.ready { background: rgba(79,195,247,0.35); border-color: #4fc3f7; animation: shldP 0.9s ease-in-out infinite; }
+    .db.shieldbtn.active { background: rgba(79,195,247,0.65); border-color: #4fc3f7; box-shadow: 0 0 14px rgba(79,195,247,0.8); }
+    .db.shieldbtn.nocharge { opacity: 0.25; }
+    @keyframes shldP { 0%,100%{box-shadow:0 0 5px rgba(79,195,247,0.3);transform:scale(1)} 50%{box-shadow:0 0 20px rgba(79,195,247,0.8);transform:scale(1.06)} }
+    .db.shieldbtn { background: rgba(79,195,247,0.18); border-color: rgba(79,195,247,0.25); color: #4fc3f7; font-size: 18px; }
+    .db.shieldbtn.ready { background: rgba(79,195,247,0.35); border-color: #4fc3f7; animation: shldPulse 0.9s ease-in-out infinite; }
+    .db.shieldbtn.active { background: rgba(79,195,247,0.65); border-color: #4fc3f7; box-shadow: 0 0 14px rgba(79,195,247,0.8); }
+    .db.shieldbtn.nocharge { opacity: 0.25; }
+    @keyframes shldPulse { 0%,100%{box-shadow:0 0 5px rgba(79,195,247,0.3);transform:scale(1)} 50%{box-shadow:0 0 20px rgba(79,195,247,0.8);transform:scale(1.06)} }
     .db.nouse { opacity: 0.25; pointer-events: none; }
     .db.shieldbtn { background: rgba(79,195,247,0.2); border-color: rgba(79,195,247,0.3); color: #4fc3f7; font-size: 18px; }
     .db.shieldbtn.ready { background: rgba(79,195,247,0.4); border-color: #4fc3f7; animation: shieldPulse 0.9s ease-in-out infinite; }
@@ -125,6 +186,8 @@
 
 <!-- HOME -->
 <div id="shome" class="scr on">
+  <div id="particles"></div>
+  <div id="particles"></div>
   <div class="home-inner">
     <div class="car-row"><span class="car-sil">🏎️</span><span class="car-sil">🏎️</span><span class="car-sil">🏎️</span></div>
     <div class="title-wrap">
@@ -182,7 +245,7 @@
       <div id="shield-wrap">
         <span id="shld-lbl">SHIELD</span>
         <div id="shld-bar"><div id="shld-fill"></div></div>
-        <span id="shld-ready">READY!</span>
+        <span id="shld-ready" style="display:none">READY!</span>
       </div>
       <span class="hs" id="hscore">0</span>
     </div>
@@ -626,7 +689,7 @@ const Race=(()=>{
     Lv=1; Sco=0; Spd=260; CL=1; Grc=3;
     En=[];St=[];Pt=[];trail=[];
     ov=false;inv=0;dT=0;dL=0;totalT=0;lsTm=0;lsSt=0;
-    shld=SHIELD_MAX; shldA=false; shldT=0; shldReady=false;
+    shld=0; shldA=false; shldT=0; shldReady=false; $('shld-fill').style.width='0%'; $('shld-ready').style.display='none';
     $('shld-fill').style.width='100%';
     $('shld-ready').style.display='none';
     $('shield-emoji').style.display='none';
@@ -670,19 +733,16 @@ const Race=(()=>{
       $('shield-emoji').textContent='🛡';
       $('shield-emoji').classList.add('ready');
       $('shield-emoji').classList.remove('active');
-      $('bshield').classList.remove('nocharge','active');
       $('bshield').classList.add('shieldbtn','ready');
     } else if(shldA){
       $('shield-emoji').style.display='inline';
       $('shield-emoji').textContent='🛡';
       $('shield-emoji').classList.add('active');
       $('shield-emoji').classList.remove('ready');
-      $('bshield').classList.remove('nocharge','ready');
       $('bshield').classList.add('shieldbtn','active');
     } else {
       $('shld-ready').style.display='none';
       $('shield-emoji').style.display='none';
-      $('bshield').classList.remove('ready','active');
       $('bshield').classList.add('shieldbtn','nocharge');
     }
 
@@ -886,16 +946,16 @@ const Parking=(()=>{
   const CW=38,CH=68;
   const ML=10;
   const Lvs=[
-    {c:{x:.5,y:.88,a:0},t:{x:.5,y:.14,w:95,h:135,a:0},o:[{x:.18,y:.14,w:60,h:125},{x:.82,y:.14,w:60,h:125},{x:.18,y:.5,w:60,h:125},{x:.82,y:.5,w:60,h:125}],tL:50},
-    {c:{x:.5,y:.9,a:0},t:{x:.25,y:.22,w:92,h:130,a:Math.PI/7},o:[{x:.75,y:.22,w:65,h:110},{x:.75,y:.55,w:65,h:110},{x:.25,y:.55,w:65,h:110},{x:.5,y:.82,w:210,h:28}],tL:55},
-    {c:{x:.5,y:.93,a:0},t:{x:.72,y:.13,w:88,h:128,a:0},o:[{x:.28,y:.13,w:55,h:118},{x:.72,y:.46,w:55,h:118},{x:.28,y:.46,w:55,h:118},{x:.5,y:.72,w:185,h:26},{x:.5,y:.33,w:26,h:195}],tL:65},
-    {c:{x:.5,y:.9,a:Math.PI},t:{x:.7,y:.12,w:86,h:124,a:Math.PI/6},o:[{x:.3,y:.12,w:52,h:114},{x:.7,y:.45,w:52,h:114},{x:.3,y:.45,w:52,h:114},{x:.5,y:.72,w:175,h:26},{x:.5,y:.3,w:26,h:180},{x:.15,y:.5,w:28,h:220}],tL:65},
-    {c:{x:.5,y:.92,a:0},t:{x:.5,y:.1,w:80,h:120,a:0},o:[{x:.22,y:.1,w:50,h:108},{x:.78,y:.1,w:50,h:108},{x:.22,y:.44,w:50,h:108},{x:.78,y:.44,w:50,h:108},{x:.5,y:.7,w:165,h:24},{x:.5,y:.32,w:24,h:190},{x:.15,y:.27,w:120,h:22},{x:.15,y:.7,w:120,h:22}],tL:70},
-    {c:{x:.25,y:.9,a:0},t:{x:.78,y:.1,w:82,h:122,a:0},o:[{x:.25,y:.1,w:52,h:112},{x:.78,y:.42,w:52,h:112},{x:.25,y:.42,w:52,h:112},{x:.5,y:.68,w:200,h:24},{x:.5,y:.3,w:24,h:200},{x:.78,y:.72,w:52,h:112}],tL:75},
-    {c:{x:.5,y:.92,a:Math.PI/2},t:{x:.14,y:.14,w:78,h:118,a:Math.PI/4},o:[{x:.5,y:.14,w:55,h:105},{x:.5,y:.45,w:55,h:105},{x:.14,y:.45,w:55,h:105},{x:.76,y:.3,w:55,h:105},{x:.76,y:.7,w:55,h:105},{x:.35,y:.7,w:160,h:24}],tL:80},
-    {c:{x:.5,y:.9,a:0},t:{x:.15,y:.5,w:75,h:115,a:0},o:[{x:.5,y:.5,w:28,h:240},{x:.15,y:.18,w:28,h:140},{x:.15,y:.82,w:28,h:140},{x:.72,y:.5,w:50,h:100}],tL:85},
-    {c:{x:.75,y:.9,a:Math.PI},t:{x:.25,y:.1,w:74,h:112,a:0},o:[{x:.25,y:.1,w:48,h:105},{x:.75,y:.1,w:48,h:105},{x:.25,y:.4,w:48,h:105},{x:.75,y:.4,w:48,h:105},{x:.5,y:.68,w:180,h:22},{x:.5,y:.2,w:22,h:180},{x:.15,y:.55,w:28,h:200},{x:.85,y:.55,w:28,h:200}],tL:90},
-    {c:{x:.5,y:.94,a:0},t:{x:.5,y:.08,w:70,h:108,a:0},o:[{x:.2,y:.08,w:46,h:100},{x:.8,y:.08,w:46,h:100},{x:.2,y:.38,w:46,h:100},{x:.8,y:.38,w:46,h:100},{x:.5,y:.65,w:155,h:22},{x:.5,y:.2,w:22,h:165},{x:.15,y:.5,w:22,h:190},{x:.85,y:.5,w:22,h:190},{x:.35,y:.82,w:130,h:22},{x:.65,y:.82,w:130,h:22}],tL:100},
+    {c:{x:.5,y:.88,a:0},t:{x:.5,y:.14,w:95,h:135,a:0},o:[{x:.18,y:.14,w:60,h:125},{x:.82,y:.14,w:60,h:125},{x:.18,y:.5,w:60,h:125},{x:.82,y:.5,w:60,h:125}],tL:30},
+    {c:{x:.5,y:.9,a:0},t:{x:.25,y:.22,w:92,h:130,a:Math.PI/7},o:[{x:.75,y:.22,w:65,h:110},{x:.75,y:.55,w:65,h:110},{x:.25,y:.55,w:65,h:110},{x:.5,y:.82,w:210,h:28}],tL:30},
+    {c:{x:.5,y:.93,a:0},t:{x:.72,y:.13,w:88,h:128,a:0},o:[{x:.28,y:.13,w:55,h:118},{x:.72,y:.46,w:55,h:118},{x:.28,y:.46,w:55,h:118},{x:.5,y:.72,w:185,h:26},{x:.5,y:.33,w:26,h:195}],tL:30},
+    {c:{x:.5,y:.9,a:Math.PI},t:{x:.7,y:.12,w:86,h:124,a:Math.PI/6},o:[{x:.3,y:.12,w:52,h:114},{x:.7,y:.45,w:52,h:114},{x:.3,y:.45,w:52,h:114},{x:.5,y:.72,w:175,h:26},{x:.5,y:.3,w:26,h:180},{x:.15,y:.5,w:28,h:220}],tL:30},
+    {c:{x:.5,y:.92,a:0},t:{x:.5,y:.1,w:80,h:120,a:0},o:[{x:.22,y:.1,w:50,h:108},{x:.78,y:.1,w:50,h:108},{x:.22,y:.44,w:50,h:108},{x:.78,y:.44,w:50,h:108},{x:.5,y:.7,w:165,h:24},{x:.5,y:.32,w:24,h:190},{x:.15,y:.27,w:120,h:22},{x:.15,y:.7,w:120,h:22}],tL:30},
+    {c:{x:.25,y:.9,a:0},t:{x:.78,y:.1,w:82,h:122,a:0},o:[{x:.25,y:.1,w:52,h:112},{x:.78,y:.42,w:52,h:112},{x:.25,y:.42,w:52,h:112},{x:.5,y:.68,w:200,h:24},{x:.5,y:.3,w:24,h:200},{x:.78,y:.72,w:52,h:112}],tL:30},
+    {c:{x:.5,y:.92,a:Math.PI/2},t:{x:.14,y:.14,w:78,h:118,a:Math.PI/4},o:[{x:.5,y:.14,w:55,h:105},{x:.5,y:.45,w:55,h:105},{x:.14,y:.45,w:55,h:105},{x:.76,y:.3,w:55,h:105},{x:.76,y:.7,w:55,h:105},{x:.35,y:.7,w:160,h:24}],tL:30},
+    {c:{x:.5,y:.9,a:0},t:{x:.15,y:.5,w:75,h:115,a:0},o:[{x:.5,y:.5,w:28,h:240},{x:.15,y:.18,w:28,h:140},{x:.15,y:.82,w:28,h:140},{x:.72,y:.5,w:50,h:100}],tL:30},
+    {c:{x:.75,y:.9,a:Math.PI},t:{x:.25,y:.1,w:74,h:112,a:0},o:[{x:.25,y:.1,w:48,h:105},{x:.75,y:.1,w:48,h:105},{x:.25,y:.4,w:48,h:105},{x:.75,y:.4,w:48,h:105},{x:.5,y:.68,w:180,h:22},{x:.15,y:.55,w:28,h:200},{x:.85,y:.55,w:28,h:200}],tL:30},
+    {c:{x:.5,y:.94,a:0},t:{x:.5,y:.08,w:70,h:108,a:0},o:[{x:.2,y:.08,w:46,h:100},{x:.8,y:.08,w:46,h:100},{x:.2,y:.38,w:46,h:100},{x:.8,y:.38,w:46,h:100},{x:.5,y:.65,w:155,h:22},{x:.15,y:.5,w:22,h:190},{x:.85,y:.5,w:22,h:190},{x:.35,y:.82,w:130,h:22},{x:.65,y:.82,w:130,h:22}],tL:30},
   ];
 
   let car,Lv,Sco,Tmr,LD,done=false,ov=false;
@@ -920,8 +980,8 @@ const Parking=(()=>{
     if(hit()){Lv--;car.s=-car.s*0.3;car.x-=Math.cos(car.a)*4;car.y-=Math.sin(car.a)*4;sCras();shakeDur=0.25;if(Lv<=0){ov=true;og();}phud();return;}
     const t=LD.t,dist=Math.hypot(car.x-t.x*BW,car.y-t.y*BH);
     const ad=((car.a-t.a)%(Math.PI*2)+Math.PI*2)%(Math.PI*2);
-    const ok=ad<0.45||Math.abs(ad-Math.PI)<0.45;
-    if(dist<Math.max(t.w,t.h)*0.48&&ok&&Math.abs(car.s)<0.7){done=true;Sco+=Math.max(0,1000-Math.floor(Tmr)*10)+Math.floor(Math.max(0,(1-Tmr/LD.tL))*300);sSucc();win();}
+    const ok=ad<0.6||Math.abs(ad-Math.PI)<0.6||ad<0.6;
+    if(dist<Math.max(t.w,t.h)*0.52&&ok&&Math.abs(car.s)<0.9){done=true;Sco+=Math.max(0,1000-Math.floor(Tmr)*10)+Math.floor(Math.max(0,(1-Tmr/LD.tL))*300);sSucc();win();}
     const rem=Math.max(0,LD.tL-Tmr),pct=rem/LD.tL;
     const fi=$('tfi');fi.style.width=(pct*100)+'%';fi.style.background=pct>0.5?'#2ecc71':pct>0.25?'#f39c12':'#e74c3c';
     $('tlbl').textContent=Math.ceil(rem)+'s';phud();
@@ -1017,6 +1077,18 @@ if(!CanvasRenderingContext2D.prototype.roundRect){
 document.addEventListener('click',  ()=>acx(),{once:true});
 document.addEventListener('touchstart',()=>acx(),{once:true});
 startGP();
+// Spawn homepage particles
+(function spawnParticles(){
+  const c=document.getElementById('particles');
+  if(!c)return;
+  for(let i=0;i<28;i++){
+    const p=document.createElement('div');
+    p.className='p';
+    const sz=2+Math.random()*5;
+    p.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;bottom:${-10}px;animation-duration:${6+Math.random()*10}s;animation-delay:${Math.random()*12}s;opacity:0;`;
+    c.appendChild(p);
+  }
+})();
 </script>
 </body>
 </html>
