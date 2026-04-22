@@ -22,6 +22,13 @@ Top-down precision driving across 3 levels of increasing difficulty.
 - **Lives:** 3 per game | Collisions cost a life
 - **Scoring:** 1000 base minus time penalty + precision bonus for clean parking
 
+### 🏎️ Vector Drift
+Pseudo-3D arcade racer with drift mechanics. Navigate curves using centrifugal physics, counter-steer through sharp turns, and manage your lateral momentum.
+- **Controls:** Arrow keys (LEFT/RIGHT = steer, UP = accelerate, DOWN = brake)
+- **Objective:** Drive as far as possible along a procedurally-curved road
+- **Mechanics:** Drift score based on lateral velocity, tire smoke at high lateral slip
+- **Scoring:** Distance traveled + drift bonus
+
 ## Platform Support
 
 | Platform | Primary Controls | Notes |
